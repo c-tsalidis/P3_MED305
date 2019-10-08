@@ -35,7 +35,7 @@ void captureEvent(Capture video) {
 void draw() {
   background(0);
   video.loadPixels();
-  // image(video, 0, 0);
+   // image(video, 0, 0);
 
   //threshold = map(mouseX, 0, width, 0, 100);
   threshold = 80;
@@ -85,19 +85,18 @@ void draw() {
     // strokeWeight(4.0);
     // stroke(0);
     noStroke();
-    ellipse(avgX, avgY, 25, 25);
+    ellipse(avgX, avgY, 50, 50);
      x[0] = avgX;
      y[0] = avgY;
      int counter = 0;
-     for (int i= numberOfCircles - 1;i > 0;i--)
-     {
+     for (int i= numberOfCircles - 1;i > 0;i--) {
        if(counter <= 255) {
          counter += 1;
        }
        x[i] = x[i-1];
        y[i] = y[i-1];
        fill(255, counter);
-       ellipse(x[i], y[i], 25, 25);
+       ellipse(x[i], y[i], counter, counter);
      }
   }
 }
