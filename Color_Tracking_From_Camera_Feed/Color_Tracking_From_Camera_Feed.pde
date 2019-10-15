@@ -13,7 +13,6 @@ Capture video;
 color trackColor; 
 float threshold = 25;
 
-
 int numberOfCircles = 50;
 float[] x = new float[numberOfCircles];
 float[] y = new float[numberOfCircles];
@@ -25,7 +24,10 @@ void setup() {
   // Works --> camera index --> 2, 3, 4, 5, 6
   video = new Capture(this, cameras[6]);
   video.start();
-  trackColor = color(0, 0, 125);
+  
+  // trackColor = color(200, 0, 0);
+  trackColor = color(200, 0, 0);
+  // trackColor = color(#FFF000); // yellow
 }
 
 void captureEvent(Capture video) {
@@ -35,7 +37,7 @@ void captureEvent(Capture video) {
 void draw() {
   background(0);
   video.loadPixels();
-   // image(video, 0, 0);
+  // image(video, 0, 0);
 
   //threshold = map(mouseX, 0, width, 0, 100);
   threshold = 80;
@@ -89,12 +91,13 @@ void draw() {
      x[0] = avgX;
      y[0] = avgY;
      int counter = 0;
-     for (int i= numberOfCircles - 1;i > 0;i--) {
+     for (int i= numberOfCircles - 1; i > 0; i--) {
        if(counter <= 255) {
          counter += 1;
        }
        x[i] = x[i-1];
        y[i] = y[i-1];
+       // fill(color(random(255), random(255), random(255)), counter);
        fill(255, counter);
        ellipse(x[i], y[i], counter, counter);
      }
@@ -110,4 +113,4 @@ void mousePressed() {
   // Save color where the mouse is clicked in trackColor variable
   int loc = mouseX + mouseY*video.width;
   trackColor = video.pixels[loc];
-}
+} 
