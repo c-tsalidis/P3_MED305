@@ -14,15 +14,15 @@ color trackColor;
 float threshold = 25;
 
 int numberOfCircles = 50;
-float[] x = new float[numberOfCircles];
-float[] y = new float[numberOfCircles];
+float [] x = new float[numberOfCircles];
+float [] y = new float[numberOfCircles];
 
 void setup() {
   size(1280, 720);
   String[] cameras = Capture.list();
   printArray(cameras);
   // Works --> camera index --> 2, 3, 4, 5, 6
-  video = new Capture(this, cameras[6]);
+  video = new Capture(this, cameras[0]);
   video.start();
   
   // trackColor = color(200, 0, 0);
