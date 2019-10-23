@@ -13,16 +13,19 @@ PImage cameraImg;
 void setup() {
    // 512 x 424
   kinect = new Kinect2(this);
+  kinect.initVideo();
   kinect.initDepth();
   kinect.initDevice();
   // size(kinnectResolutionX * 2, kinnectResolutionY * 2);
-  size(1024, 848);
+  // size(512, 424);
+  fullScreen();
   img = createImage(kinect.depthWidth, kinect.depthHeight, RGB);
   output = createImage(width, height, RGB);
-  cameraImg = kinect.getVideoImage();
 }
 
 void draw() {
+  cameraImg = kinect.getVideoImage();
+  // cameraImg = kinect.getIrImage();
   // get the grayscale image
   // 0-4500
   img.loadPixels();
@@ -51,16 +54,17 @@ void draw() {
     }
   }
   img.updatePixels();
-  image(img, 0, 0);
-  // image(output, 0, 0);
+  // image(cameraImg, 0, 0);
   colorTracking();
+  image(img, 0, 0);
 }
 
 void colorTracking() {
-  int amountCircles = 1;
+  // background(0);
+  int amountCircles = 50;
   float [] xCirles = new float[amountCircles];
   float [] yCirles = new float[amountCircles];
-  color trackColor = color(0, 0, 200);
+  color trackColor = color(200, 0, 0);
   int threshold = 80;
   float avgX = 0;
   float avgY = 0;
@@ -70,8 +74,8 @@ void colorTracking() {
     for (int y = 0; y < cameraImg.height; y++ ) {
       int loc = x + y * cameraImg.width;
       // What is current color
-      int index = x + y * cameraImg.width;
-      float b = brightness(cameraImg.pixels[index]);
+      // int index = x + y * cameraImg.width;
+      // float b = brightness(cameraImg.pixels[index]);
       color currentColor = cameraImg.pixels[loc];
       float r1 = red(currentColor);
       float g1 = green(currentColor);
@@ -86,7 +90,6 @@ void colorTracking() {
         avgX += x;
         avgY += y;
         count++;
-        println(count);
       }
     }
   }
@@ -94,9 +97,8 @@ void colorTracking() {
   // We only consider the color found if its color distance is less than 10. 
   // This threshold of 10 is arbitrary and you can adjust this number depending on how accurate you require the tracking to be.
   if (count > 0) { 
-    // avgX = avgX / count;
-    // avgY = avgY / count;
-    avgX = width - (avgX / count);
+    // avgX = width - (avgX / count);
+    avgX = avgX / count;
     avgY = avgY / count;
     // avgY = height - (avgY / count);
     // Draw a circle at the tracked pixel
