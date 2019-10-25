@@ -7,8 +7,12 @@
 // Code for: https://youtu.be/nCVZHROb_dE
 
 import processing.video.*;
+import org.openkinect.processing.*;
 
-Capture video;
+Kinect2 kinect;
+PImage cameraImg;
+
+// Capture video;
 
 color trackColor; 
 float threshold = 25;
@@ -18,13 +22,19 @@ float [] x = new float[numberOfCircles];
 float [] y = new float[numberOfCircles];
 
 void setup() {
+  kinect = new Kinect2(this);
+  kinect.initVideo();
+  kinect.initDepth();
+  kinect.initDevice();
+  fullScreen();
+  /*
   size(1280, 720);
   String[] cameras = Capture.list();
   printArray(cameras);
   // Works --> camera index --> 2, 3, 4, 5, 6
   video = new Capture(this, cameras[0]);
   video.start();
-  
+  */
   // trackColor = color(200, 0, 0);
   trackColor = color(200, 0, 0);
   // trackColor = color(#FFF000); // yellow
@@ -36,7 +46,9 @@ void captureEvent(Capture video) {
 
 void draw() {
   background(0);
-  video.loadPixels();
+  cameraImg = kinect.getVideoImage();
+  // video.loadPixels();
+  cameraImg.loadPixels();
   // image(video, 0, 0);
 
   //threshold = map(mouseX, 0, width, 0, 100);
@@ -47,11 +59,11 @@ void draw() {
 
   int count = 0;
   // Begin loop to walk through every pixel
-  for (int x = 0; x < video.width; x++ ) {
-    for (int y = 0; y < video.height; y++ ) {
-      int loc = x + y * video.width;
+  for (int x = 0; x < cameraImg.width; x++ ) {
+    for (int y = 0; y < cameraImg.height; y++ ) {
+      int loc = x + y * cameraImg.width;
       // What is current color
-      color currentColor = video.pixels[loc];
+      color currentColor = cameraImg.pixels[loc];
       float r1 = red(currentColor);
       float g1 = green(currentColor);
       float b1 = blue(currentColor);
@@ -79,7 +91,7 @@ void draw() {
   if (count > 0) { 
     // avgX = avgX / count;
     // avgY = avgY / count;
-    avgX = width - (avgX / count);
+    avgX = (avgX / count);
     avgY = avgY / count;
     // avgY = height - (avgY / count);
     // Draw a circle at the tracked pixel
@@ -102,6 +114,7 @@ void draw() {
        ellipse(x[i], y[i], counter, counter);
      }
   }
+  // image(cameraImg, 0, 0);
 }
 
 float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
@@ -111,6 +124,6 @@ float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
 
 void mousePressed() {
   // Save color where the mouse is clicked in trackColor variable
-  int loc = mouseX + mouseY*video.width;
-  trackColor = video.pixels[loc];
+  int loc = mouseX + mouseY*cameraImg.width;
+  trackColor = cameraImg.pixels[loc];
 } 
