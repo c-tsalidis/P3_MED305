@@ -11,6 +11,7 @@ PImage output;
 PImage cameraImg;
 
 void setup() {
+  
    // 512 x 424
   kinect = new Kinect2(this);
   kinect.initVideo();
@@ -19,11 +20,18 @@ void setup() {
   // size(kinnectResolutionX * 2, kinnectResolutionY * 2);
   // size(512, 424);
   fullScreen();
+  // size(displayWidth, displayHeight);
   img = createImage(kinect.depthWidth, kinect.depthHeight, RGB);
   output = createImage(width, height, RGB);
+  // println(kinect.depthWidth, kinect.depthHeight); // print to the console the resolution of the kinect's depth
+  // println(width / kinect.depthWidth);
+  // println(height / kinect.depthHeight);
+  
 }
 
 void draw() {
+  // translate(width/2, height/2);
+  background(0);
   cameraImg = kinect.getVideoImage();
   // cameraImg = kinect.getIrImage();
   // get the grayscale image
@@ -36,27 +44,21 @@ void draw() {
     for(int y = 0; y < kinect.depthHeight; y += skip) {
       int offset = x + y * kinect.depthWidth;
       int d = depth[offset];
-      // if(d <= 300) img.pixels[offset] = color(255);
       if(d > 300 && d < 1500) {
-      // if(d < 1500) {
-        img.pixels[offset] = color(150);
-        // output.pixels[offset] = color(150);
-        // output.pixels[offset + 1] = color(150);
-        // fill(150);
+        img.pixels[offset] = color(255);
+        drawSilhouette(x, y, skip, skip); // increase the size with rectangles
       }
       else {
         img.pixels[offset] = color(0);
-        // output.pixels[offset] = color(0);
-        // output.pixels[offset + 1] = color(0);
-        // fill(0);
       }
-      // rect(x * 2, y * 2, skip * 2, skip * 2); // increase the size with rectangles
     }
   }
   img.updatePixels();
   // image(cameraImg, 0, 0);
+  imageMode(CENTER);
   colorTracking();
-  image(img, 0, 0);
+  // image(img, width/2, height/2, width, height);
+  // image(img, width/2, height/2);
 }
 
 void colorTracking() {
@@ -127,4 +129,15 @@ void colorTracking() {
 float distSq(float x1, float y1, float z1, float x2, float y2, float z2) {
   float d = (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) +(z2-z1)*(z2-z1);
   return d;
+}
+
+void drawSilhouette(int _x, int _y, int _width, int _height) {
+  fill(255);
+  float xProp = 3.5; // x proprotion
+  int YProp = 3; // y proportion
+  noStroke();
+  // rect(_x * xProp, _y * YProp, _width, _height);
+  rect(_x * xProp, _y * YProp, 10, 10);
+  // point(_x * xProp, _y * YProp);
+  // ellipse(_x * xProp, _y * YProp, 2, 2);
 }
