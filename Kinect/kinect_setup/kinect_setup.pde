@@ -22,6 +22,9 @@ int sizeCounter;
 ArrayList<Float> xDrawings = new ArrayList<Float>();
 ArrayList<Float> yDrawings = new ArrayList<Float>();
 
+float xFinalDrawing;
+float yFinalDrawing;
+
 void setup() {
   kinect = new Kinect2(this);
   kinect.initVideo();
@@ -32,22 +35,12 @@ void setup() {
   frameRate(30);
   noStroke();
   img = createImage(kinect.depthWidth, kinect.depthHeight, RGB);
-  // xDrawings = new float[1000];
-  // yDrawings = new float[1000];
 }
 
 void draw() {
   background(0);
-  /*
-  if(redColorCounter > 255) redColorCounter = 0; else redColorCounter++;
-   if(greenColorCounter > 255) greenColorCounter = 0; else  { if(redColorCounter > 255) greenColorCounter++; }
-   if(blueColorCounter > 255) blueColorCounter = 0; else {if(greenColorCounter > 255) blueColorCounter++;}
-   */
   processDepth();
   createDrawing();
-  // println(drawingIndexCounter);
-  // println("User is drawing: " + isDrawing);
-  // println(xDrawings.size());
 }
 
 void processDepth() {
@@ -69,11 +62,6 @@ void processDepth() {
       }
     }
   }
-  // img.updatePixels();
-  // image(cameraImg, 0, 0);
-  // imageMode(CENTER);
-  // image(img, width/2, height/2, width, height);
-  // image(img, width/2, height/2);
 }
 
 void drawSilhouette(int _x, int _y, int d) {
@@ -93,13 +81,13 @@ void drawSilhouette(int _x, int _y, int d) {
     isDrawing = true;
     // fill(255, 0, 0, 100);
     // if (xDrawings.size() < 70000) {
-      if(sizeCounter < 50000) {
+      if(sizeCounter < 10000) {
       // xDrawings[drawingIndexCounter] = _x * xProp;
       // yDrawings[drawingIndexCounter] = _y * yProp;
       // int sameCounterX = 0;
       xDrawings.add(_x * xProp);
       yDrawings.add(_y * yProp);
-      sizeCounter+=10;
+      sizeCounter+=1;
        /*
       for(int i = 0; i < xDrawings.size(); i++) {
         if((_x * xProp) == xDrawings.get(i)) {
@@ -126,51 +114,9 @@ void drawSilhouette(int _x, int _y, int d) {
 }
 
 void createDrawing() {
-  float x = 0;
-  float y = 0;
-  float x2;
-  float y2;
-  float easing = 0.3;
-  float diameter = 20;
-  float targetX = hand_x;
-  float dx = (hand_x-x) * easing;
-  float targetY = hand_y;
-  float dy = (hand_y-y) * easing;
-  float t;
-  float cx;
-  float cy;
-  float steps;
-
   for (int i = 0; i < xDrawings.size(); i++) {
     // println("Drawing all of em");
     fill(255, 0, 0, 100);
     ellipse(xDrawings.get(i), yDrawings.get(i), 25, 25);
-  }
-
-  if (isDrawing) {
-    
-    /*
-    x2 = x + dx;
-     y2 = y + dy;
-     // Draw additional circles between frames for smooth brushstrokes
-     steps = 80;
-     for (int i = 0; i <= steps; i += 1) {
-     t = i/steps;
-     cx = lerp(x, x2, t); //get fractional x positions
-     cy = lerp(y, y2, t); //get fractional y positions
-     pushMatrix();
-     translate (cx, cy);
-     //Draw lines
-     fill(255);
-     ellipse(-(diameter/2), -(diameter/2), diameter, diameter);
-     popMatrix();
-     }
-     x = x2;
-     y = y2;
-     } else {
-     x = targetX;
-     y = targetY;
-     }
-     */
   }
 }
