@@ -11,7 +11,7 @@ void setup() {
   smooth();
   frameRate(70);
   
-  background(255);
+  background(0);
   noStroke();
 }
 
@@ -42,7 +42,7 @@ void draw() {
       translate (cx, cy);
       
       //Draw lines
-      fill(100);
+      fill(255);
       ellipse(-(diameter/2), -(diameter/2), diameter, diameter);
       popMatrix();
     }
@@ -56,13 +56,10 @@ void draw() {
     y = targetY;
     
   }
-  
-  clearCanvas();
 }
 
-
-void clearCanvas() {
+void keyPressed() {
   if (keyCode == UP) {
-    background(255);
+    background(0);
   }
 }
