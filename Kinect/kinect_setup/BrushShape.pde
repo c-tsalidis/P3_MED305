@@ -17,7 +17,7 @@ class BrushShape {
   
   // methods
   void display() {
-    if(hand_x == this.x && hand_y == this.y) {
+    if(dist(hand_x, hand_y, this.x, this.y) < 50) {
       this._color = currentDrawingColor;
     }
     fill(this._color);
