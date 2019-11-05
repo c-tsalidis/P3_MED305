@@ -22,6 +22,7 @@ Star [] myStars = new Star[1200]; // the stars for the background
 boolean isDrawing; // is the user inside the boundaries for drawing?
 
 color currentDrawingColor;
+float currentDepth;
 
 PImage previousFrameDrawingImage;
 PImage defaultCanvasImage;
@@ -40,6 +41,7 @@ void setup() {
   // smooth();
   noStroke(); // get rid of strokes to whatever is being drawn
   img = createImage(kinect.depthWidth, kinect.depthHeight, RGB);
+  defaultCanvasImage = get();
   previousFrameDrawingImage = createImage(width, height, RGB);
   createStars(); // only need to create the stars once, so do it in setup
   // createBrushes();
@@ -54,6 +56,7 @@ void draw() {
   updateColor(); // update the color depending on where the hands are at
   createDrawing(); // show the drawing of the player every frame
   drawHands(); // draw the hands
+  // currentDrawingColor = color(random(0, 256), random(0, 256), random(0, 256));
   getCurrentDrawingImage();
 }
 
@@ -66,6 +69,7 @@ void processDepth() {
       int d = depth[offset]; // get the depth value corresponding to the current pixel
       if (d > minSilhouetteThreshold && d < maxSilhouetteThreshold) {
         drawSilhouette(x, y, d);
+        currentDepth = d;
       }
     }
   }
@@ -123,12 +127,12 @@ void updateDrawingCoordinates(int depth, float _x, float _y, float xProp, float 
     // ellipse(_x * xProp, _y * yProp, 25, 25);
     /*
     brushes[0].x = _x * xProp;
-    brushes[0].y = _y * yProp;
-    for (int i = brushes.length - 1; i > 0; i--) {
-      brushes[i].x = brushes[i-1].x;
-      brushes[i].y = brushes[i-1].y;
-    }
-    */
+     brushes[0].y = _y * yProp;
+     for (int i = brushes.length - 1; i > 0; i--) {
+     brushes[i].x = brushes[i-1].x;
+     brushes[i].y = brushes[i-1].y;
+     }
+     */
   } else isDrawing = false;
 }
 
@@ -179,7 +183,7 @@ void getCurrentDrawingImage() {
     for (int y = 0; y < currentCanvas.height; y++) {
       int loc = x + y * currentCanvas.width;
       if (brightness(currentCanvas.pixels[loc]) != 255) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
-      else previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
+      else if (currentDepth < minDrawingThreshold) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
     }
   }
   previousFrameDrawingImage.updatePixels();
@@ -187,6 +191,15 @@ void getCurrentDrawingImage() {
 
 void keyPressed() {
   if (keyCode == UP) {
-    background(#161616);
+    // image(defaultCanvasImage, 0, 0);
+    // previousFrameDrawingImage = defaultCanvasImage;
+    previousFrameDrawingImage.loadPixels();
+    for (int x = 0; x < previousFrameDrawingImage.width; x++) {
+      for (int y = 0; y < previousFrameDrawingImage.height; y++) {
+        int loc = x + y * previousFrameDrawingImage.width;
+        previousFrameDrawingImage.pixels[loc] = #161616;
+      }
+    }
+    previousFrameDrawingImage.updatePixels();
   }
 }
