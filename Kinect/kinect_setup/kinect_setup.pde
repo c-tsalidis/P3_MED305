@@ -14,14 +14,17 @@ int maxHandThreshold = 1000;
 float hand_x; 
 float hand_y;
 
+int imagesCounter = 0;
+
 Star [] myStars = new Star[1200]; // the stars for the background
-BrushShape [] brushes = new BrushShape[5000];
+// BrushShape [] brushes = new BrushShape[5000];
 
 boolean isDrawing; // is the user inside the boundaries for drawing?
 
 color currentDrawingColor;
 
-PImage drawingImage;
+PImage previousFrameDrawingImage;
+PImage defaultCanvasImage;
 
 ArrayList<Float> xHandCoordinates = new ArrayList<Float>();
 ArrayList<Float> yHandCoordinates = new ArrayList<Float>();
@@ -29,32 +32,29 @@ ArrayList<Float> yHandCoordinates = new ArrayList<Float>();
 String colorText;
 
 void setup() {
+  background(#161616);
   kinect = new Kinect2(this);
-  kinect.initVideo();
   kinect.initDepth();
   kinect.initDevice();
   fullScreen();
-  smooth();
-  frameRate(120);
+  // smooth();
   noStroke(); // get rid of strokes to whatever is being drawn
   img = createImage(kinect.depthWidth, kinect.depthHeight, RGB);
-  drawingImage = createImage(width, height, RGB);
+  previousFrameDrawingImage = createImage(width, height, RGB);
   createStars(); // only need to create the stars once, so do it in setup
-  createBrushes();
+  // createBrushes();
   currentDrawingColor = color(255, 0, 0, 100); // by default make the drawing color red with an alpha of 100
 }
 
 void draw() {
-  image(drawingImage, 0, 0);
+  image(previousFrameDrawingImage, 0, 0);
   drawBackground();
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   updateHands(); // after processing the depth data, update the hands position
   updateColor(); // update the color depending on where the hands are at
   createDrawing(); // show the drawing of the player every frame
   drawHands(); // draw the hands
-  // text of the color
-  textSize(32);
-  text(hex(currentDrawingColor), 20, height - 50);
+  getCurrentDrawingImage();
 }
 
 void processDepth() {
@@ -77,15 +77,16 @@ void createStars() {
   }
 }
 
+/*
 void createBrushes() {
-  for (int i = 0; i < brushes.length; i++) {
-    brushes[i] = new BrushShape();
-  }
-}
+ for (int i = 0; i < brushes.length; i++) {
+ brushes[i] = new BrushShape();
+ }
+ }
+ */
 
 void drawBackground() {
   translate(width/2, height/2);
-  background(#161616); 
   for (int i = 0; i < myStars.length; i++) {
     myStars[i].show();
     myStars[i].pulsate();
@@ -107,23 +108,27 @@ void drawSilhouette(int _x, int _y, int d) {
 }
 
 void createDrawing() {
+  /*
   for (int i = 0; i < brushes.length; i++) {
-    brushes[i].display();
-  }
+   brushes[i].display();
+   }
+   */
 }
 
 void updateDrawingCoordinates(int depth, float _x, float _y, float xProp, float yProp) {
   if (depth < minDrawingThreshold) {
     // int minDist = 3;
     isDrawing = true;
+    // fill(currentDrawingColor);
+    // ellipse(_x * xProp, _y * yProp, 25, 25);
+    /*
     brushes[0].x = _x * xProp;
     brushes[0].y = _y * yProp;
-    // savedX[0] = _x * xProp;
-    // savedY[0] = _y * yProp;
     for (int i = brushes.length - 1; i > 0; i--) {
       brushes[i].x = brushes[i-1].x;
       brushes[i].y = brushes[i-1].y;
     }
+    */
   } else isDrawing = false;
 }
 
@@ -131,6 +136,9 @@ void updateColor() {
   if (hand_y < 150) {
     float value = map(hand_x, 0, width, 0, 255); // get the same RGB value equivalent to the position of the hand in the x axis
     currentDrawingColor = color(value, 0, value, 100);
+    // text of the color
+    textSize(32);
+    text(hex(currentDrawingColor), 20, height - 50);
   }
 }
 
@@ -159,6 +167,26 @@ void updateHands() {
 }
 
 void drawHands() {
-  fill(currentDrawingColor, 255);
+  fill(currentDrawingColor);
   ellipse(hand_x, hand_y, 30, 30);
+}
+
+void getCurrentDrawingImage() {
+  imagesCounter++;
+  PImage currentCanvas = get();
+  previousFrameDrawingImage.loadPixels();
+  for (int x = 0; x < currentCanvas.width; x++) {
+    for (int y = 0; y < currentCanvas.height; y++) {
+      int loc = x + y * currentCanvas.width;
+      if (brightness(currentCanvas.pixels[loc]) != 255) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
+      else previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
+    }
+  }
+  previousFrameDrawingImage.updatePixels();
+}
+
+void keyPressed() {
+  if (keyCode == UP) {
+    background(#161616);
+  }
 }
