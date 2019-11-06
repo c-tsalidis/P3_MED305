@@ -14,8 +14,6 @@ int maxHandThreshold = 1000;
 float hand_x; 
 float hand_y;
 
-int imagesCounter = 0;
-
 Star [] myStars = new Star[1200]; // the stars for the background
 // BrushShape [] brushes = new BrushShape[5000];
 
@@ -44,8 +42,7 @@ void setup() {
   defaultCanvasImage = get();
   previousFrameDrawingImage = createImage(width, height, RGB);
   createStars(); // only need to create the stars once, so do it in setup
-  // createBrushes();
-  currentDrawingColor = color(255, 0, 0, 100); // by default make the drawing color red with an alpha of 100
+  currentDrawingColor = color(255, 0, 0); // by default make the drawing color red with an alpha of 100
 }
 
 void draw() {
@@ -54,9 +51,7 @@ void draw() {
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   updateHands(); // after processing the depth data, update the hands position
   updateColor(); // update the color depending on where the hands are at
-  createDrawing(); // show the drawing of the player every frame
-  drawHands(); // draw the hands
-  // currentDrawingColor = color(random(0, 256), random(0, 256), random(0, 256));
+  // drawHands(); // draw the hands
   getCurrentDrawingImage();
 }
 
@@ -71,6 +66,7 @@ void processDepth() {
         drawSilhouette(x, y, d);
         currentDepth = d;
       }
+      // if(d > (minSilhouetteThreshold) && d < maxSilhouetteThreshold) drawBrush(x, y, d);
     }
   }
 }
@@ -80,14 +76,6 @@ void createStars() {
     myStars[i] = new Star();
   }
 }
-
-/*
-void createBrushes() {
- for (int i = 0; i < brushes.length; i++) {
- brushes[i] = new BrushShape();
- }
- }
- */
 
 void drawBackground() {
   translate(width/2, height/2);
@@ -103,43 +91,22 @@ void drawSilhouette(int _x, int _y, int d) {
   float yProp = 3; // y proportion
   // newWidth = newHeight * aspectRatio;
   float xProp = yProp * (kinect.depthWidth / kinect.depthHeight); // x proportion
-  if (_x * xProp < 150 && _y * yProp < 150) return; // there are some dots in tge upper left corner that are annoying, so just don't paint them. Alternatively, filter the noise
+  // if (_x * xProp < 150 && _y * yProp < 150) return; // there are some dots in tge upper left corner that are annoying, so just don't paint them. Alternatively, filter the noise
   rect(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the silhoutte
-  updateDrawingCoordinates(d, _x, _y, xProp, yProp);
   xHandCoordinates.add(_x * xProp);
   yHandCoordinates.add(_y * yProp);
-  // if(d < maxHandThreshold) updateHands();
-}
-
-void createDrawing() {
-  /*
-  for (int i = 0; i < brushes.length; i++) {
-   brushes[i].display();
-   }
-   */
-}
-
-void updateDrawingCoordinates(int depth, float _x, float _y, float xProp, float yProp) {
-  if (depth < minDrawingThreshold) {
-    // int minDist = 3;
-    isDrawing = true;
-    // fill(currentDrawingColor);
-    // ellipse(_x * xProp, _y * yProp, 25, 25);
-    /*
-    brushes[0].x = _x * xProp;
-     brushes[0].y = _y * yProp;
-     for (int i = brushes.length - 1; i > 0; i--) {
-     brushes[i].x = brushes[i-1].x;
-     brushes[i].y = brushes[i-1].y;
-     }
-     */
-  } else isDrawing = false;
+  if( d < minDrawingThreshold) {
+    fill(currentDrawingColor);
+    rect(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the hands
+  }
 }
 
 void updateColor() {
   if (hand_y < 150) {
-    float value = map(hand_x, 0, width, 0, 255); // get the same RGB value equivalent to the position of the hand in the x axis
-    currentDrawingColor = color(value, 0, value, 100);
+    // float value = map(hand_x, 0, width, 0, 255); // get the same RGB value equivalent to the position of the hand in the x axis
+    // float value = random(1, 255);
+    // currentDrawingColor = color(value, 0, value);
+    currentDrawingColor = color(random(1, 255),random(1, 255),random(1, 255));
     // text of the color
     textSize(32);
     text(hex(currentDrawingColor), 20, height - 50);
@@ -176,14 +143,14 @@ void drawHands() {
 }
 
 void getCurrentDrawingImage() {
-  imagesCounter++;
   PImage currentCanvas = get();
   previousFrameDrawingImage.loadPixels();
   for (int x = 0; x < currentCanvas.width; x++) {
     for (int y = 0; y < currentCanvas.height; y++) {
       int loc = x + y * currentCanvas.width;
-      if (brightness(currentCanvas.pixels[loc]) != 255) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
-      else if (currentDepth < minDrawingThreshold) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
+      // if the current pixel is not the same color as 150 in grayscale, then it means it is part of the silhoutte, so paint that pixel to the same as the current canvas one
+      if (color(currentCanvas.pixels[loc]) != color(255) && color(currentCanvas.pixels[loc]) != currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
+      else if(color(currentCanvas.pixels[loc]) == currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
     }
   }
   previousFrameDrawingImage.updatePixels();
@@ -191,8 +158,6 @@ void getCurrentDrawingImage() {
 
 void keyPressed() {
   if (keyCode == UP) {
-    // image(defaultCanvasImage, 0, 0);
-    // previousFrameDrawingImage = defaultCanvasImage;
     previousFrameDrawingImage.loadPixels();
     for (int x = 0; x < previousFrameDrawingImage.width; x++) {
       for (int y = 0; y < previousFrameDrawingImage.height; y++) {
