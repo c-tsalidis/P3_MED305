@@ -108,8 +108,10 @@ void updateColor() {
     // currentDrawingColor = color(value, 0, value);
     currentDrawingColor = color(random(1, 255),random(1, 255),random(1, 255));
     // text of the color
-    textSize(32);
-    text(hex(currentDrawingColor), 20, height - 50);
+    // textSize(32);
+    fill(currentDrawingColor);
+    rect(20, height - 50, 30, 15);
+    // text(hex(currentDrawingColor), 20, height - 50);
   }
 }
 
@@ -148,7 +150,7 @@ void getCurrentDrawingImage() {
   for (int x = 0; x < currentCanvas.width; x++) {
     for (int y = 0; y < currentCanvas.height; y++) {
       int loc = x + y * currentCanvas.width;
-      // if the current pixel is not the same color as 150 in grayscale, then it means it is part of the silhoutte, so paint that pixel to the same as the current canvas one
+      // if the current pixel is not the same color as 150 in grayscale, then it means it is part of the silhouette, so paint that pixel to the same as the current canvas one
       if (color(currentCanvas.pixels[loc]) != color(255) && color(currentCanvas.pixels[loc]) != currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
       else if(color(currentCanvas.pixels[loc]) == currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
     }
