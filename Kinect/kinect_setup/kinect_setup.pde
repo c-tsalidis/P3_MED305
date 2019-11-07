@@ -30,8 +30,11 @@ ArrayList<Float> yHandCoordinates = new ArrayList<Float>();
 
 String colorText;
 
+color backgroundColor = color(#161616);
+color previousDrawingColor;
+
 void setup() {
-  background(#161616);
+  background(backgroundColor);
   kinect = new Kinect2(this);
   kinect.initDepth();
   kinect.initDevice();
@@ -95,24 +98,27 @@ void drawSilhouette(int _x, int _y, int d) {
   rect(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the silhoutte
   xHandCoordinates.add(_x * xProp);
   yHandCoordinates.add(_y * yProp);
-  if( d < minDrawingThreshold) {
+  if ( d < minDrawingThreshold) {
     fill(currentDrawingColor);
-    rect(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the hands
+    noStroke();
+    rect(_x * xProp, _y * yProp, 3, 3); // create a rectangle for showing the hands
   }
 }
 
 void updateColor() {
-  if (hand_y < 150) {
-    // float value = map(hand_x, 0, width, 0, 255); // get the same RGB value equivalent to the position of the hand in the x axis
-    // float value = random(1, 255);
-    // currentDrawingColor = color(value, 0, value);
-    currentDrawingColor = color(random(1, 255),random(1, 255),random(1, 255));
-    // text of the color
-    // textSize(32);
-    fill(currentDrawingColor);
-    rect(20, height - 50, 30, 15);
-    // text(hex(currentDrawingColor), 20, height - 50);
+  stroke(255);
+  line(0, 150, width, 150);
+  stroke(255);
+  line(width - 150, 0, width - 150, height);
+  noStroke();
+  if (hand_y < 150 && hand_x < (width - 150)) {
+    currentDrawingColor = color(random(1, 255), random(1, 255), random(1, 255));
   }
+  if (hand_y > 150 && hand_x > (width - 150)) { 
+    currentDrawingColor = backgroundColor;
+  }
+  fill(currentDrawingColor);
+  rect(20, height - 50, 30, 15);
 }
 
 void updateHands() {
@@ -132,7 +138,7 @@ void updateHands() {
     hand_x = avgX / counter;
     hand_y = avgY / counter;
   } else {
-    hand_x = width;
+    hand_x = 0;
     hand_y = height;
   }
   xHandCoordinates.clear();
@@ -152,7 +158,7 @@ void getCurrentDrawingImage() {
       int loc = x + y * currentCanvas.width;
       // if the current pixel is not the same color as 150 in grayscale, then it means it is part of the silhouette, so paint that pixel to the same as the current canvas one
       if (color(currentCanvas.pixels[loc]) != color(255) && color(currentCanvas.pixels[loc]) != currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
-      else if(color(currentCanvas.pixels[loc]) == currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
+      else if (color(currentCanvas.pixels[loc]) == currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
     }
   }
   previousFrameDrawingImage.updatePixels();
@@ -164,9 +170,10 @@ void keyPressed() {
     for (int x = 0; x < previousFrameDrawingImage.width; x++) {
       for (int y = 0; y < previousFrameDrawingImage.height; y++) {
         int loc = x + y * previousFrameDrawingImage.width;
-        previousFrameDrawingImage.pixels[loc] = #161616;
+        previousFrameDrawingImage.pixels[loc] = backgroundColor;
       }
     }
     previousFrameDrawingImage.updatePixels();
   }
+  if (keyCode == RIGHT) saveFrame("Drawing-######.png");
 }
