@@ -11,27 +11,32 @@ int minDrawingThreshold = 800;
 int minHandThreshold = 700;
 int maxHandThreshold = 1000;
 
-float hand_x; 
-float hand_y;
+float centerOfMass_x; 
+float centerOfMass_y;
 
 Star [] myStars = new Star[1200]; // the stars for the background
-// BrushShape [] brushes = new BrushShape[5000];
 
 boolean isDrawing; // is the user inside the boundaries for drawing?
 
 color currentDrawingColor;
-float currentDepth;
 
 PImage previousFrameDrawingImage;
 PImage defaultCanvasImage;
 
-ArrayList<Float> xHandCoordinates = new ArrayList<Float>();
-ArrayList<Float> yHandCoordinates = new ArrayList<Float>();
+ArrayList<Float> xCenterOfMassCoordinates = new ArrayList<Float>();
+ArrayList<Float> yCenterOfMassCoordinates = new ArrayList<Float>();
 
 String colorText;
 
 color backgroundColor = color(#161616);
-color previousDrawingColor;
+
+int numColors = 6;
+int [] xColorPalette = new int[numColors];
+int [] yColorPalette = new int[numColors];
+color [] drawingColors = new color[numColors];
+int colorPaletteHeight = 100;
+int eraserWidth = 50;
+int colorPalettesWidth;
 
 void setup() {
   background(backgroundColor);
@@ -46,6 +51,7 @@ void setup() {
   previousFrameDrawingImage = createImage(width, height, RGB);
   createStars(); // only need to create the stars once, so do it in setup
   currentDrawingColor = color(255, 0, 0); // by default make the drawing color red with an alpha of 100
+  createColors();
 }
 
 void draw() {
@@ -54,8 +60,8 @@ void draw() {
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   updateHands(); // after processing the depth data, update the hands position
   updateColor(); // update the color depending on where the hands are at
-  // drawHands(); // draw the hands
-  getCurrentDrawingImage();
+  // showCenterOfMass(); // draw the center of mass
+  getCurrentDrawingImage(); // get the current image and save it, and replace the white silhouette with the background
 }
 
 void processDepth() {
@@ -67,9 +73,7 @@ void processDepth() {
       int d = depth[offset]; // get the depth value corresponding to the current pixel
       if (d > minSilhouetteThreshold && d < maxSilhouetteThreshold) {
         drawSilhouette(x, y, d);
-        currentDepth = d;
       }
-      // if(d > (minSilhouetteThreshold) && d < maxSilhouetteThreshold) drawBrush(x, y, d);
     }
   }
 }
@@ -77,6 +81,21 @@ void processDepth() {
 void createStars() {
   for (int i = 0; i < myStars.length; i++) {
     myStars[i] = new Star();
+  }
+}
+
+void createColors() {
+  int colorCounter = 0;
+  colorPalettesWidth = ((width - eraserWidth) / drawingColors.length);
+  drawingColors[0] = color(#FFFF00); // yellow
+  drawingColors[1] = color(#FFA500); // orange
+  drawingColors[2] = color(#FF0000); // red
+  drawingColors[3] = color(#FF00FF); // purple
+  drawingColors[4] = color(#0000FF); // blue
+  drawingColors[5] = color(#00FF00); // green
+  for(int i = 0; i < drawingColors.length; i++) {
+    xColorPalette[i] = colorCounter;
+    colorCounter += colorPalettesWidth;
   }
 }
 
@@ -90,32 +109,34 @@ void drawBackground() {
 }
 
 void drawSilhouette(int _x, int _y, int d) {
-  fill(255);
   float yProp = 3; // y proportion
   // newWidth = newHeight * aspectRatio;
   float xProp = yProp * (kinect.depthWidth / kinect.depthHeight); // x proportion
   // if (_x * xProp < 150 && _y * yProp < 150) return; // there are some dots in tge upper left corner that are annoying, so just don't paint them. Alternatively, filter the noise
-  rect(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the silhoutte
-  xHandCoordinates.add(_x * xProp);
-  yHandCoordinates.add(_y * yProp);
+  xCenterOfMassCoordinates.add(_x * xProp);
+  yCenterOfMassCoordinates.add(_y * yProp);
   if ( d < minDrawingThreshold) {
     fill(currentDrawingColor);
-    noStroke();
-    rect(_x * xProp, _y * yProp, 3, 3); // create a rectangle for showing the hands
+    ellipse(_x * xProp, _y * yProp, 4, 4); // create a rectangle for showing the hands
+  }
+  else {
+    fill(255);
+    rect(_x * xProp, _y * yProp, 1, 1); // create a rectangle for showing the silhoutte
   }
 }
 
 void updateColor() {
   stroke(255);
-  line(0, 150, width, 150);
+  // line(0, colorPaletteHeight, width, colorPaletteHeight);
   stroke(255);
-  line(width - 150, 0, width - 150, height);
+  line(width - eraserWidth, 0, width - eraserWidth, height);
   noStroke();
-  if (hand_y < 150 && hand_x < (width - 150)) {
-    currentDrawingColor = color(random(1, 255), random(1, 255), random(1, 255));
+  if (centerOfMass_y < colorPaletteHeight) {
+    // currentDrawingColor = color(random(1, 255), random(1, 255), random(1, 255));
+    createColorPallete();
   }
-  if (hand_y > 150 && hand_x > (width - 150)) { 
-    currentDrawingColor = backgroundColor;
+  if (centerOfMass_y > colorPaletteHeight && centerOfMass_x > (width - eraserWidth)) {
+    currentDrawingColor = backgroundColor; // activate the eraser
   }
   fill(currentDrawingColor);
   rect(20, height - 50, 30, 15);
@@ -125,34 +146,34 @@ void updateHands() {
   // get the center position of the hands by calculating the average position of all the x and y coordinates
   // the best way for calculating the center position of the hands is by calculating the median instead of the average, but for now I'll do it with the average
   int counter = 0;
-  float avgX = 0;
-  float avgY = 0;
-  for (int i = 0; i < xHandCoordinates.size(); i++) {
-    float x = xHandCoordinates.get(i);
-    float y = yHandCoordinates.get(i);
-    avgX += x;
-    avgY += y;
+  float xCounter = 0;
+  float yCounter = 0;
+  for (int i = 0; i < xCenterOfMassCoordinates.size(); i++) {
+    float x = xCenterOfMassCoordinates.get(i);
+    float y = yCenterOfMassCoordinates.get(i);
+    xCounter += x;
+    yCounter += y;
     counter++;
   }
   if (counter > 25) { // only update the hand coordinates if the counter is higher than this number so as to avoid possible noises that interfere with the hand tracking
-    hand_x = avgX / counter;
-    hand_y = avgY / counter;
+    centerOfMass_x = xCounter / counter;
+    centerOfMass_y = yCounter / counter;
   } else {
-    hand_x = 0;
-    hand_y = height;
+    centerOfMass_x = 0;
+    centerOfMass_y = height;
   }
-  xHandCoordinates.clear();
-  yHandCoordinates.clear();
+  xCenterOfMassCoordinates.clear();
+  yCenterOfMassCoordinates.clear();
 }
 
-void drawHands() {
+void showCenterOfMass() {
   fill(currentDrawingColor);
-  ellipse(hand_x, hand_y, 30, 30);
+  ellipse(centerOfMass_x, centerOfMass_y, 30, 30);
 }
 
 void getCurrentDrawingImage() {
-  PImage currentCanvas = get();
-  previousFrameDrawingImage.loadPixels();
+  PImage currentCanvas = get(); // get the current frame image
+  previousFrameDrawingImage.loadPixels(); // load the previous image pixels
   for (int x = 0; x < currentCanvas.width; x++) {
     for (int y = 0; y < currentCanvas.height; y++) {
       int loc = x + y * currentCanvas.width;
@@ -161,10 +182,19 @@ void getCurrentDrawingImage() {
       else if (color(currentCanvas.pixels[loc]) == currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
     }
   }
-  previousFrameDrawingImage.updatePixels();
+  previousFrameDrawingImage.updatePixels(); // update the previous image pixels
+}
+
+void createColorPallete() {
+  for(int i = 0; i < numColors; i++) {
+    fill(drawingColors[i], 100);
+    rect(xColorPalette[i], 0, colorPalettesWidth, colorPaletteHeight / 2);
+    if(centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
+  }
 }
 
 void keyPressed() {
+  // if the user presses the 'UP' key on the keyboard, then replace every pixel of the canvas with the background color
   if (keyCode == UP) {
     previousFrameDrawingImage.loadPixels();
     for (int x = 0; x < previousFrameDrawingImage.width; x++) {
@@ -175,5 +205,6 @@ void keyPressed() {
     }
     previousFrameDrawingImage.updatePixels();
   }
-  if (keyCode == RIGHT) saveFrame("Drawing-######.png");
+  // if the user presses the 'RIGHT' key on the keyboard, then save the current frame to the device as a .png file
+  if (keyCode == RIGHT) saveFrame("Drawing.png");
 }
