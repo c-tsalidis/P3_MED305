@@ -6,10 +6,7 @@ PImage img;
 int minSilhouetteThreshold = 700;
 int maxSilhouetteThreshold = 1500;
 
-int minDrawingThreshold = 800;
-
-int minHandThreshold = 700;
-int maxHandThreshold = 1000;
+int minDrawingThreshold = minSilhouetteThreshold + 200;
 
 float centerOfMass_x; 
 float centerOfMass_y;
@@ -61,7 +58,11 @@ void draw() {
   updateHands(); // after processing the depth data, update the hands position
   updateColor(); // update the color depending on where the hands are at
   // showCenterOfMass(); // draw the center of mass
+  showColorPalette();
   getCurrentDrawingImage(); // get the current image and save it, and replace the white silhouette with the background
+  // createColorPallete();
+  // fill(200);
+  // text(centerOfMass_x + " | " +  centerOfMass_y, 20, height - 50);
 }
 
 void processDepth() {
@@ -117,11 +118,11 @@ void drawSilhouette(int _x, int _y, int d) {
   yCenterOfMassCoordinates.add(_y * yProp);
   if ( d < minDrawingThreshold) {
     fill(currentDrawingColor);
-    ellipse(_x * xProp, _y * yProp, 4, 4); // create a rectangle for showing the hands
+    ellipse(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the hands
   }
   else {
     fill(255);
-    rect(_x * xProp, _y * yProp, 1, 1); // create a rectangle for showing the silhoutte
+    rect(_x * xProp, _y * yProp, 2, 2); // create a rectangle for showing the silhoutte
   }
 }
 
@@ -158,9 +159,8 @@ void updateHands() {
   if (counter > 25) { // only update the hand coordinates if the counter is higher than this number so as to avoid possible noises that interfere with the hand tracking
     centerOfMass_x = xCounter / counter;
     centerOfMass_y = yCounter / counter;
-  } else {
-    centerOfMass_x = 0;
-    centerOfMass_y = height;
+    // centerOfMass_x = getMedianValue(xCenterOfMassCoordinates);
+    // centerOfMass_y = getMedianValue(yCenterOfMassCoordinates);
   }
   xCenterOfMassCoordinates.clear();
   yCenterOfMassCoordinates.clear();
@@ -187,9 +187,14 @@ void getCurrentDrawingImage() {
 
 void createColorPallete() {
   for(int i = 0; i < numColors; i++) {
-    fill(drawingColors[i], 100);
-    rect(xColorPalette[i], 0, colorPalettesWidth, colorPaletteHeight / 2);
     if(centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
+  }
+}
+
+void showColorPalette() {
+  for(int i = 0; i < numColors; i++) {
+    fill(drawingColors[i]);
+    rect(xColorPalette[i], 0, colorPalettesWidth, colorPaletteHeight / 2);
   }
 }
 
@@ -207,4 +212,11 @@ void keyPressed() {
   }
   // if the user presses the 'RIGHT' key on the keyboard, then save the current frame to the device as a .png file
   if (keyCode == RIGHT) saveFrame("Drawing.png");
+}
+
+float getMedianValue(ArrayList<Float> list) {
+  double median = 0;
+  if (list.size() % 2 == 0) median = ((double)list.get(list.size() / 2) + (double)list.get(list.size() / 2 - 1))/2;
+  else median = (double) list.get(list.size() / 2);
+  return (float)median;
 }
