@@ -1,8 +1,8 @@
 import KinectPV2.*;
 
-import org.openkinect.processing.*;
+// import org.openkinect.processing.*;
 
-Kinect2 kinect;
+KinectPV2 kinect;
 PImage img;
 
 int minSilhouetteThreshold = 700;
@@ -39,13 +39,17 @@ int colorPalettesWidth;
 
 void setup() {
   background(backgroundColor);
-  kinect = new Kinect2(this);
-  kinect.initDepth();
-  kinect.initDevice();
+  kinect = new KinectPV2(this);
+  // kinect.initDepth();
+  // kinect.initDevice();
+  
+  kinect.enableInfraredImg(true);
+  kinect.enableDepthImg(true);
+  kinect.init();
   fullScreen();
   // smooth();
   noStroke(); // get rid of strokes to whatever is being drawn
-  img = createImage(kinect.depthWidth, kinect.depthHeight, RGB);
+  img = createImage(kinect.WIDTHDepth, kinect.HEIGHTDepth, RGB);
   defaultCanvasImage = get();
   previousFrameDrawingImage = createImage(width, height, RGB);
   createStars(); // only need to create the stars once, so do it in setup
@@ -68,11 +72,11 @@ void draw() {
 }
 
 void processDepth() {
-  int [] depth = kinect.getRawDepth(); // get the depth values ranging from 0-4500 from the kinect
+  int [] depth = kinect.getRawDepthData(); // get the depth values ranging from 0-4500 from the kinect
   int skip = 1;
-  for (int x = 0; x < kinect.depthWidth; x += skip) {
-    for (int y = 0; y < kinect.depthHeight; y += skip) {
-      int offset = x + y * kinect.depthWidth;
+  for (int x = 0; x < kinect.WIDTHDepth; x += skip) {
+    for (int y = 0; y < kinect.HEIGHTDepth; y += skip) {
+      int offset = x + y * kinect.WIDTHDepth;
       int d = depth[offset]; // get the depth value corresponding to the current pixel
       if (d > minSilhouetteThreshold && d < maxSilhouetteThreshold) {
         drawSilhouette(x, y, d);
@@ -114,7 +118,7 @@ void drawBackground() {
 void drawSilhouette(int _x, int _y, int d) {
   float yProp = 3; // y proportion
   // newWidth = newHeight * aspectRatio;
-  float xProp = yProp * (kinect.depthWidth / kinect.depthHeight); // x proportion
+  float xProp = yProp * (kinect.WIDTHDepth / kinect.HEIGHTDepth); // x proportion
   // if (_x * xProp < 150 && _y * yProp < 150) return; // there are some dots in tge upper left corner that are annoying, so just don't paint them. Alternatively, filter the noise
   xCenterOfMassCoordinates.add(_x * xProp);
   yCenterOfMassCoordinates.add(_y * yProp);
