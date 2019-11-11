@@ -1,5 +1,3 @@
-import KinectPV2.*;
-
 import org.openkinect.processing.*;
 
 Kinect2 kinect;
@@ -40,6 +38,7 @@ int colorPalettesWidth;
 void setup() {
   background(backgroundColor);
   kinect = new Kinect2(this);
+  kinect.initVideo();
   kinect.initDepth();
   kinect.initDevice();
   fullScreen();
@@ -65,6 +64,8 @@ void draw() {
   // createColorPallete();
   // fill(200);
   // text(centerOfMass_x + " | " +  centerOfMass_y, 20, height - 50);
+  // PImage depthImage = kinect.getDepthImage();
+  // image(depthImage, 0, 0);
 }
 
 void processDepth() {
@@ -160,7 +161,7 @@ void updateHands() {
   }
   if (counter > 25) { // only update the hand coordinates if the counter is higher than this number so as to avoid possible noises that interfere with the hand tracking
     centerOfMass_x = xCounter / counter;
-    centerOfMass_y = yCounter / counter;
+    centerOfMass_y = yCounter / counter - 50;
     // centerOfMass_x = getMedianValue(xCenterOfMassCoordinates);
     // centerOfMass_y = getMedianValue(yCenterOfMassCoordinates);
   }
@@ -213,7 +214,7 @@ void keyPressed() {
     previousFrameDrawingImage.updatePixels();
   }
   // if the user presses the 'RIGHT' key on the keyboard, then save the current frame to the device as a .png file
-  if (keyCode == RIGHT) saveFrame("Drawing.png");
+  if (keyCode == RIGHT) saveFrame("Drawing-######.png");
 }
 
 float getMedianValue(ArrayList<Float> list) {
