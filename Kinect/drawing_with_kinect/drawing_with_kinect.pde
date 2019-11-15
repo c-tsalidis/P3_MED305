@@ -122,14 +122,14 @@ void drawSilhouette(int _x, int _y, int d) {
   if ( d < minDrawingThreshold) {
     fill(currentDrawingColor);
     ellipse(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the hands
-  }
+  } 
   else {
     fill(255);
     rect(_x * xProp, _y * yProp, 2, 2); // create a rectangle for showing the silhoutte
   }
 }
 
-void updateColor() {
+void checkColor() { //checks the color and if the user is erasing
   stroke(255);
   // line(0, colorPaletteHeight, width, colorPaletteHeight);
   stroke(255);
@@ -137,7 +137,7 @@ void updateColor() {
   noStroke();
   if (centerOfMass_y < colorPaletteHeight) {
     // currentDrawingColor = color(random(1, 255), random(1, 255), random(1, 255));
-    createColorPallete();
+    updateColor();
   }
   if (centerOfMass_y > colorPaletteHeight && centerOfMass_x > (width - eraserWidth)) {
     currentDrawingColor = backgroundColor; // activate the eraser
@@ -188,7 +188,7 @@ void getCurrentDrawingImage() {
   previousFrameDrawingImage.updatePixels(); // update the previous image pixels
 }
 
-void createColorPallete() {
+void updateColor() {
   for(int i = 0; i < numColors; i++) {
     if(centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
   }
