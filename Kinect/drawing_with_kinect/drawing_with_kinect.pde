@@ -16,6 +16,7 @@ Star [] myStars = new Star[1200]; // the stars for the background
 boolean isDrawing; // is the user inside the boundaries for drawing?
 
 color currentDrawingColor;
+color silhouetteColor = color(255);
 
 PImage previousFrameDrawingImage;
 PImage defaultCanvasImage;
@@ -113,57 +114,45 @@ void drawBackground() {
 }
 
 void drawSilhouette(int _x, int _y, int d) {
-  float yProp = 3; // y proportion
-  // newWidth = newHeight * aspectRatio;
-  float xProp = yProp * (kinect.depthWidth / kinect.depthHeight); // x proportion
-  // if (_x * xProp < 150 && _y * yProp < 150) return; // there are some dots in tge upper left corner that are annoying, so just don't paint them. Alternatively, filter the noise
+  float yProp = 3; // y proportion --> Value chosen because it's the one that worked best
+  float xProp = yProp * (kinect.depthWidth / kinect.depthHeight); // x proportion --> // newWidth = newHeight * aspectRatio;
   xCenterOfMassCoordinates.add(_x * xProp);
   yCenterOfMassCoordinates.add(_y * yProp);
   if ( d < minDrawingThreshold) {
     fill(currentDrawingColor);
-    ellipse(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the hands
+    ellipse(_x * xProp, _y * yProp, 5, 5); // create a rectangle for showing the hands (what the user is currently drawing)
   }
   else {
-    fill(255);
-    rect(_x * xProp, _y * yProp, 2, 2); // create a rectangle for showing the silhoutte
+    fill(silhouetteColor);
+    rect(_x * xProp, _y * yProp, 2, 2); // create a rectangle for showing the silhoutte of the user
   }
 }
 
 void updateColor() {
   stroke(255);
   // line(0, colorPaletteHeight, width, colorPaletteHeight);
-  stroke(255);
   line(width - eraserWidth, 0, width - eraserWidth, height);
   noStroke();
-  if (centerOfMass_y < colorPaletteHeight) {
-    // currentDrawingColor = color(random(1, 255), random(1, 255), random(1, 255));
-    createColorPallete();
-  }
-  if (centerOfMass_y > colorPaletteHeight && centerOfMass_x > (width - eraserWidth)) {
-    currentDrawingColor = backgroundColor; // activate the eraser
-  }
+  if (centerOfMass_y < colorPaletteHeight) updateCurrentDrawingColor(); // check if the user has the center of mass over a certain color in the color palette, and if so, update the color to the corresponding one
+  if (centerOfMass_y > colorPaletteHeight && centerOfMass_x > (width - eraserWidth)) currentDrawingColor = backgroundColor; // activate the eraser if the user is selecting the eraser
+  // feedback to the user of the current drawing color
   fill(currentDrawingColor);
-  rect(20, height - 50, 30, 15);
+  rect(20, height - 50, 100, 30);
 }
 
 void updateHands() {
   // get the center position of the hands by calculating the average position of all the x and y coordinates
-  // the best way for calculating the center position of the hands is by calculating the median instead of the average, but for now I'll do it with the average
   int counter = 0;
   float xCounter = 0;
   float yCounter = 0;
   for (int i = 0; i < xCenterOfMassCoordinates.size(); i++) {
-    float x = xCenterOfMassCoordinates.get(i);
-    float y = yCenterOfMassCoordinates.get(i);
-    xCounter += x;
-    yCounter += y;
+    xCounter += xCenterOfMassCoordinates.get(i);
+    yCounter += yCenterOfMassCoordinates.get(i);
     counter++;
   }
   if (counter > 25) { // only update the hand coordinates if the counter is higher than this number so as to avoid possible noises that interfere with the hand tracking
     centerOfMass_x = xCounter / counter;
     centerOfMass_y = yCounter / counter - 50;
-    // centerOfMass_x = getMedianValue(xCenterOfMassCoordinates);
-    // centerOfMass_y = getMedianValue(yCenterOfMassCoordinates);
   }
   xCenterOfMassCoordinates.clear();
   yCenterOfMassCoordinates.clear();
@@ -180,15 +169,15 @@ void getCurrentDrawingImage() {
   for (int x = 0; x < currentCanvas.width; x++) {
     for (int y = 0; y < currentCanvas.height; y++) {
       int loc = x + y * currentCanvas.width;
-      // if the current pixel is not the same color as 150 in grayscale, then it means it is part of the silhouette, so paint that pixel to the same as the current canvas one
-      if (color(currentCanvas.pixels[loc]) != color(255) && color(currentCanvas.pixels[loc]) != currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
+      if (color(currentCanvas.pixels[loc]) != silhouetteColor && color(currentCanvas.pixels[loc]) != currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentCanvas.pixels[loc];
       else if (color(currentCanvas.pixels[loc]) == currentDrawingColor) previousFrameDrawingImage.pixels[loc] = currentDrawingColor;
+      else if (color(currentCanvas.pixels[loc]) == silhouetteColor) previousFrameDrawingImage.pixels[loc] = backgroundColor;
     }
   }
   previousFrameDrawingImage.updatePixels(); // update the previous image pixels
 }
 
-void createColorPallete() {
+void updateCurrentDrawingColor() {
   for(int i = 0; i < numColors; i++) {
     if(centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
   }
@@ -215,11 +204,4 @@ void keyPressed() {
   }
   // if the user presses the 'RIGHT' key on the keyboard, then save the current frame to the device as a .png file
   if (keyCode == RIGHT) saveFrame("Drawing-######.png");
-}
-
-float getMedianValue(ArrayList<Float> list) {
-  double median = 0;
-  if (list.size() % 2 == 0) median = ((double)list.get(list.size() / 2) + (double)list.get(list.size() / 2 - 1))/2;
-  else median = (double) list.get(list.size() / 2);
-  return (float)median;
 }
