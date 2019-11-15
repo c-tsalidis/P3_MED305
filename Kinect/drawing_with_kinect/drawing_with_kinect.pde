@@ -58,7 +58,7 @@ void draw() {
   drawBackground();
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   updateHands(); // after processing the depth data, update the hands position
-  updateColor(); // update the color depending on where the hands are at
+  checkColor(); // update the color depending on where the hands are at
   // showCenterOfMass(); // draw the center of mass
   showColorPalette();
   getCurrentDrawingImage(); // get the current image and save it, and replace the white silhouette with the background
@@ -128,7 +128,7 @@ void drawSilhouette(int _x, int _y, int d) {
   }
 }
 
-void updateColor() {
+void checkColor() {
   stroke(255);
   // line(0, colorPaletteHeight, width, colorPaletteHeight);
   line(width - eraserWidth, 0, width - eraserWidth, height);
