@@ -5,12 +5,14 @@ class Slider {
   float colorWidth = width;
   float sPos = width/2;
   float colourVal = map(sPos, 0.0, colorWidth, 0.0, 255.0);
+  
 
   // constructor
   Slider() {}
   
   void update() { // this is like draw
     colourVal= updateSlider(20.0, 20.0, width-100, 30.0, colourVal);
+
   }
   
   float updateSlider(float xPos, float yPos, float sliderW, float sliderH, float hueVal) {
@@ -29,6 +31,7 @@ class Slider {
     fill(hueVal, 255, 255);
     rect(colorPos + xPos - 3, yPos - 5, 6, sliderH + 10);
     rect(sliderW + 40, yPos, sliderH, sliderH);
+    currentDrawingColor = color(hueVal,255,255);
     return hueVal;
   }
 }
