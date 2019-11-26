@@ -11,6 +11,7 @@ int minDrawingThreshold = 100;
 int maxDrawingThreshold = 900;
 
 color currentDrawingColor;
+color previousColor;
 color silhouetteColor = color(255);
 
 PImage backgroundImage;
@@ -32,8 +33,7 @@ int colorPalettesWidth;
 
 boolean isMouseControlled = true;
 
-Slider slider = new Slider();
-
+Toolbar toolbar;
 
 // runs once
 void setup() {
@@ -46,6 +46,8 @@ void setup() {
   noStroke(); // get rid of strokes to whatever is being drawn
   backgroundImage = createImage(width, height, RGB);
   currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
+  previousColor = currentDrawingColor;
+  toolbar = new Toolbar();
   //createColors();
 }
 
@@ -58,7 +60,7 @@ void draw() {
   // showCenterOfMass(); // draw the center of mass - for testing purposes
   showColorPalette();
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
-  slider.update();
+  toolbar.update();
 }
 
 void processDepth() {
