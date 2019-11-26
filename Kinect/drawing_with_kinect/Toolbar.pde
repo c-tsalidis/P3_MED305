@@ -14,7 +14,7 @@ class Toolbar {
   }
   
   void update() {
-    slider.updateSlider();
+    slider.update();
     eraser.update();
     pipet.update();
     toolbarButton.update();
