@@ -22,8 +22,6 @@ ArrayList<Float> ySilhouetteCoordinates = new ArrayList<Float>();
 float centerOfMass_x; 
 float centerOfMass_y;
 
-int numberCoordinatesSilhouette;
-
 int numColors = 6;
 int [] xColorPalette = new int[numColors];
 int [] yColorPalette = new int[numColors];
@@ -64,6 +62,7 @@ void processDepth() {
     for (int y = 0; y < kinect.depthHeight; y += skip) {
       int offset = x + y * kinect.depthWidth;
       int d = depth[offset]; // get the depth value corresponding to the current pixel
+      // adjusting x and y to the correct ratio of the screen
       float _x = map(x, 0, kinect.depthWidth, 0, width);
       float _y = map(y, 0, kinect.depthHeight, 0, height);
       if (d > minSilhouetteThreshold && d < maxSilhouetteThreshold) drawSilhouette(_x, _y);
@@ -101,7 +100,6 @@ void makeDrawing(float x, float y) {
 
 void checkColor() {
   stroke(255);
-  // line(0, colorPaletteHeight, width, colorPaletteHeight);
   line(width - eraserWidth, 0, width - eraserWidth, height);
   noStroke();
   if (centerOfMass_y < colorPaletteHeight) updateCurrentDrawingColor(); // check if the user has the center of mass over a certain color in the color palette, and if so, update the color to the corresponding one
@@ -112,22 +110,29 @@ void checkColor() {
 }
 
 void updateCenterOfMass() {
-  // get the center position of the hands by calculating the average position of all the x and y coordinates
+  // get the center position of the silhouette by calculating the average position of all the x and y coordinates that are inside of the color palette hitbox 
   // average = (sum of all coordinates) / (number of coordinates)
-  numberCoordinatesSilhouette = 0; // amount of coordinates of the silhouette
+  // in this case, we only want to calculate the center of mass of what is 
+  int numberCoordinatesSilhouette = 0; // amount of coordinates of the silhouette
   float xCounter = 0; // used to calculate the sum of all the x coordinates of the silhouette
-  float yCounter = 0;
+  float yCounter = 0; // used to calculate the sum of all the y coordinates of the silhouette
+  int yOffset = -50; // used to offset the center of mass in the y axis to allow the users to select colors more easily
   for (int i = 0; i < xSilhouetteCoordinates.size(); i++) {
-    xCounter += xSilhouetteCoordinates.get(i);
-    yCounter += ySilhouetteCoordinates.get(i);
-    numberCoordinatesSilhouette++;
+    if(ySilhouetteCoordinates.get(i) < (colorPaletteHeight + yOffset) || xSilhouetteCoordinates.get(i) > (width - eraserWidth)) {
+      xCounter += xSilhouetteCoordinates.get(i);
+      yCounter += ySilhouetteCoordinates.get(i);
+      numberCoordinatesSilhouette++;
+    }
   }
-  centerOfMass_x = xCounter / numberCoordinatesSilhouette;
-  centerOfMass_y = yCounter / numberCoordinatesSilhouette - 50;
-  // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
-  xSilhouetteCoordinates.clear();
-  ySilhouetteCoordinates.clear();
-  numberCoordinatesSilhouette = 0;
+  // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
+  if(numberCoordinatesSilhouette > 50) {
+    centerOfMass_x = xCounter / numberCoordinatesSilhouette;
+    centerOfMass_y = yCounter / numberCoordinatesSilhouette + yOffset;
+    // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
+    xSilhouetteCoordinates.clear();
+    ySilhouetteCoordinates.clear();
+    numberCoordinatesSilhouette = 0;
+  }
 }
 
 void showCenterOfMass() {
@@ -137,10 +142,11 @@ void showCenterOfMass() {
 
 void updateBackgroundImage() {
   PImage currentCanvas = get(); // get the current frame image
-  backgroundImage.loadPixels(); // load the previous image pixels
+  backgroundImage.loadPixels(); // load the background image pixels
   for (int x = 0; x < currentCanvas.width; x++) {
     for (int y = 0; y < currentCanvas.height; y++) {
       int loc = x + y * currentCanvas.width;
+      // if the current canvas's pixel color is the same color as the currentDrawingColor (i.e --> red), then it will paint that pixel on the background image to red
       if (color(currentCanvas.pixels[loc]) == currentDrawingColor) backgroundImage.pixels[loc] = currentDrawingColor;
     }
   }
