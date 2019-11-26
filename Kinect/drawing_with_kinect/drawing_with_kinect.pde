@@ -32,7 +32,6 @@ int colorPalettesWidth;
 
 boolean isMouseControlled = true;
 
-Slider slider;
 
 // runs once
 void setup() {
@@ -46,7 +45,6 @@ void setup() {
   backgroundImage = createImage(width, height, RGB);
   currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
   createColors();
-  slider = new Slider();
 }
 
 // runs every frame --> 60fps by default
@@ -58,7 +56,6 @@ void draw() {
   // showCenterOfMass(); // draw the center of mass - for testing purposes
   showColorPalette();
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
-  slider.updateSlider();
 }
 
 void processDepth() {
