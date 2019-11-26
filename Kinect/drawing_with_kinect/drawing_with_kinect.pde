@@ -30,6 +30,10 @@ int colorPaletteHeight = 100;
 int eraserWidth = 50;
 int colorPalettesWidth;
 
+boolean isMouseControlled = true;
+
+Slider slider;
+
 // runs once
 void setup() {
   background(backgroundColor);
@@ -42,6 +46,7 @@ void setup() {
   backgroundImage = createImage(width, height, RGB);
   currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
   createColors();
+  slider = new Slider();
 }
 
 // runs every frame --> 60fps by default
@@ -53,6 +58,7 @@ void draw() {
   // showCenterOfMass(); // draw the center of mass - for testing purposes
   showColorPalette();
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
+  slider.updateSlider();
 }
 
 void processDepth() {
@@ -110,6 +116,11 @@ void checkColor() {
 }
 
 void updateCenterOfMass() {
+  if(isMouseControlled) { 
+    centerOfMass_x = mouseX;
+    centerOfMass_y = mouseY;
+    return;
+  }
   // get the center position of the silhouette by calculating the average position of all the x and y coordinates that are inside of the color palette hitbox 
   // average = (sum of all coordinates) / (number of coordinates)
   // in this case, we only want to calculate the center of mass of what is 
