@@ -42,9 +42,13 @@ int noiseFilter = 50;
 
 Toolbar toolbar;
 
+String feedback = "feedback";
+
 boolean isErasing = false, isPipetting = false, showToolbar = false;
 
 float pipetX, pipetY;
+
+color pipetColor;
 
 // runs once
 void setup() {
@@ -56,36 +60,46 @@ void setup() {
   smooth(8);
   noStroke(); // get rid of strokes to whatever is being drawn
   backgroundImage = createImage(width, height, RGB);
-  currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
+  currentDrawingColor = color(0, 255, 0); // by default make the drawing color red
   previousColor = currentDrawingColor;
   toolbar = new Toolbar();
 }
 
 // runs every frame --> 60fps by default
 void draw() {
+  colorMode(RGB);
   image(backgroundImage, 0, 0);
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
   calculatePipetCenterOfMass();
   if(isPipetting) {
-    color newColor = color(get((int)pipetX, (int)pipetY));
+    pipetColor = color(get((int)pipetX, (int)pipetY));
     previousColor = currentDrawingColor;
-    currentDrawingColor = newColor;// pixel color corresponding to x and y
-    println(currentDrawingColor);
+    currentDrawingColor = pipetColor;// pixel color corresponding to x and y
   }
-  else currentDrawingColor = previousColor;
+  float r  = red(currentDrawingColor);
+  float g  = green(currentDrawingColor);
+  float b  = blue(currentDrawingColor);
+  println(r,g,b);
+  // else currentDrawingColor = previousColor;
   toolbar.update();
-  // ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
+  ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
   xSilhouetteCoordinates.clear();
   ySilhouetteCoordinates.clear();
   closestDepths.clear();
   xClosestDepthCoord.clear();
   yClosestDepthCoord.clear();
-  
   centerOfMass_x = width * 2;
   centerOfMass_y = height * 2;
+  
+  // feedback for tool slected
+  fill(255);
+  rect(50, height - 50, 100, 50);
+  fill(0);
+  // textAlign(CENTER);
+  text(feedback, 50, height - 50, 50, 25);
 }
 
 void processDepth() {

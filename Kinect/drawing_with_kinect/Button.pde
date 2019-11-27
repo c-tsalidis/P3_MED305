@@ -36,8 +36,10 @@ class Button {
           if(isErasing) {
             previousColor = currentDrawingColor;
             currentDrawingColor = backgroundColor;
+            feedback = "Eraser";
           } else {
             currentDrawingColor = previousColor;
+            feedback = "feedback";
           }
         }
       }
@@ -45,8 +47,14 @@ class Button {
         if (!hasEnteredPipet) {
           isPipetting = !isPipetting;
           hasEnteredPipet = true;
-          if(isPipetting) println("Pipetting");
-          else println("Not pipetting");
+          if(isPipetting) {
+            println("Pipetting");
+            feedback = "pipet";
+          }
+          else {
+            println("Not pipetting");
+            feedback = "feedback";
+          }
         }
       }
     }

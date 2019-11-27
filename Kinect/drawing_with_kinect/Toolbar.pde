@@ -26,16 +26,4 @@ class Toolbar {
       pipet.update();
     }
   }
-  /*
-  void checkHitboxes(int x, int y) {
-    if(eraser.isInsideHitbox()) calculateCenterOfMassFromHitbox(eraser);
-    else if(pipet.isInsideHitbox()) calculateCenterOfMassFromHitbox(pipet);
-    else if(toolbarButton.isInsideHitbox()) calculateCenterOfMassFromHitbox(toolbarButton);
-  }
-  
-  void calculateCenterOfMassFromHitbox(Button b) {
-    centerOfMass_x = (b.x + b.bWidth) / 2;
-    centerOfMass_y = (b.y + b.bHeight) / 2;
-  }
-  */
 }

@@ -38,6 +38,7 @@ class Slider {
     // rect(sliderW + 40, yPos, sliderH, sliderH); // rectangle telling the user what color it is
     noStroke();
     if(!isErasing && !isPipetting) currentDrawingColor = color(hueVal,255,255);
+    if(isPipetting) currentDrawingColor = pipetColor;
     return hueVal;
   }
   
