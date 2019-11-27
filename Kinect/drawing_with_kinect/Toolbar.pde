@@ -2,7 +2,7 @@ class Toolbar {
   // variables
   Slider slider; // creating the slider
   Button eraser, pipet, toolbarButton; // creating the buttons
-  
+  PImage eraserImg, pipetImg, toolbarImg;
   // constructor
   Toolbar() {
     // initializing the slider

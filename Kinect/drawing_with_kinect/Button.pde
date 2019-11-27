@@ -4,9 +4,10 @@ class Button {
   boolean isEraser, isPipet, isToolbarButton;
   boolean hasEntered = false;
   String text;
+  PImage image;
   
   // constructor
-  Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isPipet, boolean _isToolbarButton, String _text) {
+  Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isPipet, boolean _isToolbarButton, String _text, PImage _image) {
     this.x = _x;
     this.y = _y;
     this.bWidth = _bWidth;
@@ -15,6 +16,7 @@ class Button {
     this.isPipet = _isPipet;
     this.isToolbarButton = _isToolbarButton;
     this.text = _text;
+    this.image = _image;
   }
 
   void update() {
@@ -46,14 +48,8 @@ class Button {
   }
   
   void display() {
-    fill(255);
-    // stroke(255);
-    rect(this.x, this.y, this.bWidth, this.bHeight);
-    // noStroke();
-    fill(0);
-    textSize(15);
-    textAlign(CENTER, CENTER);
-    text(this.text, this.bWidth / 2, this.bHeight / 2);
+    imageMode(CENTER);
+    image(this.image, 0, 0);
   }
 
   boolean isInsideHitbox() {
