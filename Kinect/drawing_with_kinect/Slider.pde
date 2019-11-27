@@ -10,7 +10,10 @@ class Slider {
   Slider() {}
   
   void update() { // this is like draw
-    if(showToolbar) colourVal = updateSlider((width / 2) - (colorBarWidth / 2), 0, colorBarWidth, 50.0, colourVal);
+    this.calculateCenterOfMass();
+    if(showToolbar) {
+      colourVal = updateSlider((width / 4), 0, colorBarWidth, 50.0, colourVal);
+    }
   }
   
   float updateSlider(float xPos, float yPos, float sliderW, float sliderH, float hueVal) {
@@ -32,5 +35,30 @@ class Slider {
     noStroke();
     currentDrawingColor = color(hueVal,255,255);
     return hueVal;
+  }
+  
+  boolean isInsideHitbox(float x, float y) {
+    if (x > ((width / 2) - (colorBarWidth / 2)) && x < ((width / 2) - (colorBarWidth / 2) + this.colorBarWidth) &&
+      y > 0 && y < (50)) {
+      return true;
+    } else return false;
+  }
+  
+  void calculateCenterOfMass() {
+    int numberCoordinatesSilhouette = 0; // the number of coordinates of the silhouette that are inside of this button's hitbox
+    int xSum = 0, ySum = 0;
+    for(int i = 0; i < xSilhouetteCoordinates.size(); i++) {
+      if(isInsideHitbox(xSilhouetteCoordinates.get(i), ySilhouetteCoordinates.get(i))) {
+        xSum += xSilhouetteCoordinates.get(i);
+        ySum += ySilhouetteCoordinates.get(i);
+        numberCoordinatesSilhouette++;
+      }
+    }
+    // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
+    if(numberCoordinatesSilhouette > 5) {
+      centerOfMass_x = xSum / numberCoordinatesSilhouette;
+      centerOfMass_y = ySum / numberCoordinatesSilhouette;
+      numberCoordinatesSilhouette = 0;
+    }
   }
 }

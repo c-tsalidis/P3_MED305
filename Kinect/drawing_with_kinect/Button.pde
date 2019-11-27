@@ -21,7 +21,8 @@ class Button {
 
   void update() {
     this.display();
-    if (this.isInsideHitbox()) {
+    this.calculateCenterOfMass();
+    if (this.centerOfMassisInsideHitbox()) {
       if (!hasEntered) {
         if (this.isEraser) {
           // if (currentDrawingColor != backgroundColor) currentDrawingColor = backgroundColor;
@@ -45,20 +46,40 @@ class Button {
   }
 
   void display() {
-
     fill(255);
     rect( this.x, this.y, this.bWidth, this.bHeight);
     image(this.image, this.x, this.y, this.bWidth, this.bHeight);
   }
 
-  boolean isInsideHitbox() {
+  boolean isInsideHitbox(float x, float y) {
+    if (x > this.x && x < (this.x + this.bWidth) &&
+      y > this.y && y < (this.y + this.bHeight)) {
+      return true;
+    } else return false;
+  }
+  
+  boolean centerOfMassisInsideHitbox() {
     if (centerOfMass_x > this.x && centerOfMass_x < (this.x + this.bWidth) &&
       centerOfMass_y > this.y && centerOfMass_y < (this.y + this.bHeight)) {
       return true;
     } else return false;
   }
 
-  void checkCenterOfMass() {
-    // check from the x and y coordinates of the silhouette if the center of mass is in between this button's hitbox
+  void calculateCenterOfMass() {
+    int numberCoordinatesSilhouette = 0; // the number of coordinates of the silhouette that are inside of this button's hitbox
+    int xSum = 0, ySum = 0;
+    for(int i = 0; i < xSilhouetteCoordinates.size(); i++) {
+      if(isInsideHitbox(xSilhouetteCoordinates.get(i), ySilhouetteCoordinates.get(i))) {
+        xSum += xSilhouetteCoordinates.get(i);
+        ySum += ySilhouetteCoordinates.get(i);
+        numberCoordinatesSilhouette++;
+      }
+    }
+    // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
+    if(numberCoordinatesSilhouette > 5) {
+      centerOfMass_x = xSum / numberCoordinatesSilhouette;
+      centerOfMass_y = ySum / numberCoordinatesSilhouette;
+      numberCoordinatesSilhouette = 0;
+    }
   }
 }

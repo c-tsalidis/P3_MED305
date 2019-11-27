@@ -31,7 +31,7 @@ int colorPaletteHeight = 100;
 int eraserWidth = 50;
 int colorPalettesWidth;
 
-boolean isMouseControlled = true;
+boolean isMouseControlled = false;
 
 Toolbar toolbar;
 
@@ -57,12 +57,15 @@ void setup() {
 void draw() {
   image(backgroundImage, 0, 0);
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
-  updateCenterOfMass(); // after processing the depth data, update the hands position
+  // updateCenterOfMass(); // after processing the depth data, update the hands position
   showCenterOfMass(); // draw the center of mass - for testing purposes 
   // checkColor(); // update the color depending on where the hands are at
   // showColorPalette();
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
   toolbar.update();
+  // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
+  xSilhouetteCoordinates.clear();
+  ySilhouetteCoordinates.clear();
 }
 
 void processDepth() {
