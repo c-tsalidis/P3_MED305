@@ -66,6 +66,11 @@ class Button {
   }
 
   void calculateCenterOfMass() {
+    if(isMouseControlled) { 
+      centerOfMass_x = mouseX;
+      centerOfMass_y = mouseY;
+      return;
+    }
     int numberCoordinatesSilhouette = 0; // the number of coordinates of the silhouette that are inside of this button's hitbox
     int xSum = 0, ySum = 0;
     for(int i = 0; i < xSilhouetteCoordinates.size(); i++) {

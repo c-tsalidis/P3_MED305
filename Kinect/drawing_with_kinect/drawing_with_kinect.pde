@@ -127,8 +127,6 @@ void updateCenterOfMass() {
   if(isMouseControlled) { 
     centerOfMass_x = mouseX;
     centerOfMass_y = mouseY;
-    xSilhouetteCoordinates.add(centerOfMass_x);
-    ySilhouetteCoordinates.add(centerOfMass_y);
     return;
   }
   // get the center position of the silhouette by calculating the average position of all the x and y coordinates that are inside of the color palette hitbox 
