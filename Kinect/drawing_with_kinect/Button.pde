@@ -5,7 +5,7 @@ class Button {
   boolean hasEntered = false;
   String text;
   PImage image;
-  
+
   // constructor
   Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isPipet, boolean _isToolbarButton, String _text, PImage _image) {
     this.x = _x;
@@ -28,28 +28,27 @@ class Button {
           // else currentDrawingColor = previousColor;
           isErasing = !isErasing;
           // println("is erasing: "+ isErasing);
-        }
-        else if (this.isPipet) {
+        } else if (this.isPipet) {
           // the user is selecting color from the drawing
           isPipetting = !isPipetting;
           // println("is pipetting: " + isPipetting);
-        }
-        else if (this.isToolbarButton) {
+        } else if (this.isToolbarButton) {
           // the user wants to either show or hide the tool bar
           showToolbar = !showToolbar;
           // println("isShowing toolbar: " + showToolbar);
         }
         hasEntered = true;
       }
-    }
-    else {
+    } else {
       hasEntered = false;
     }
   }
-  
+
   void display() {
-    imageMode(CENTER);
-    image(this.image, 0, 0);
+
+    fill(255);
+    rect( this.x, this.y, this.bWidth, this.bHeight);
+    image(this.image, this.x, this.y, this.bWidth, this.bHeight);
   }
 
   boolean isInsideHitbox() {
@@ -58,7 +57,7 @@ class Button {
       return true;
     } else return false;
   }
-  
+
   void checkCenterOfMass() {
     // check from the x and y coordinates of the silhouette if the center of mass is in between this button's hitbox
   }

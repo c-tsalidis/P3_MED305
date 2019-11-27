@@ -31,7 +31,7 @@ int colorPaletteHeight = 100;
 int eraserWidth = 50;
 int colorPalettesWidth;
 
-boolean isMouseControlled = false;
+boolean isMouseControlled = true;
 
 Toolbar toolbar;
 

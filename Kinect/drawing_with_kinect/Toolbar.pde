@@ -8,9 +8,12 @@ class Toolbar {
     // initializing the slider
     slider = new Slider();
     // initializing the buttons
-    eraser = new Button(0, 0, 100, 50, true, false, false, "Eraser");
-    pipet = new Button(100, 0, 100, 50, false, true, false, "pipet");
-    toolbarButton = new Button(width - 100, 0, 100, 50, false, false, true, "Toolbar");
+    eraserImg = loadImage("eraser.png");
+    pipetImg = loadImage("pipette.png");
+    toolbarImg = loadImage("pipette.png");
+    eraser = new Button(0, 0, 100, 50, true, false, false, "Eraser", eraserImg);
+    pipet = new Button(100, 0, 100, 50, false, true, false, "pipet", pipetImg);
+    toolbarButton = new Button(width - 100, 0, 100, 50, false, false, true, "Toolbar", toolbarImg);
   }
   
   void update() {
