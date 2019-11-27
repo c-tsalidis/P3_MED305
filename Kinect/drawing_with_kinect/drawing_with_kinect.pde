@@ -31,9 +31,11 @@ int colorPaletteHeight = 100;
 int eraserWidth = 50;
 int colorPalettesWidth;
 
-boolean isMouseControlled = true;
+boolean isMouseControlled = false;
 
 Toolbar toolbar;
+
+boolean isErasing = false, isPipetting = false, showToolbar = false;
 
 // runs once
 void setup() {
@@ -56,9 +58,9 @@ void draw() {
   image(backgroundImage, 0, 0);
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   updateCenterOfMass(); // after processing the depth data, update the hands position
-  checkColor(); // update the color depending on where the hands are at
-  // showCenterOfMass(); // draw the center of mass - for testing purposes
-  showColorPalette();
+  showCenterOfMass(); // draw the center of mass - for testing purposes 
+  // checkColor(); // update the color depending on where the hands are at
+  // showColorPalette();
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
   toolbar.update();
 }
@@ -117,6 +119,7 @@ void checkColor() {
   rect(20, height - 50, 100, 30);
 }
 
+
 void updateCenterOfMass() {
   if(isMouseControlled) { 
     centerOfMass_x = mouseX;
@@ -131,11 +134,12 @@ void updateCenterOfMass() {
   float yCounter = 0; // used to calculate the sum of all the y coordinates of the silhouette
   int yOffset = -50; // used to offset the center of mass in the y axis to allow the users to select colors more easily
   for (int i = 0; i < xSilhouetteCoordinates.size(); i++) {
-    if(ySilhouetteCoordinates.get(i) < (colorPaletteHeight + yOffset) || xSilhouetteCoordinates.get(i) > (width - eraserWidth)) {
+    // toolbar.checkHitboxes(xSilhouetteCoordinates.get(i), ySilhouetteCoordinates.get(i));
+    // if(ySilhouetteCoordinates.get(i) < (colorPaletteHeight + yOffset) || xSilhouetteCoordinates.get(i) > (width - eraserWidth)) {
       xCounter += xSilhouetteCoordinates.get(i);
       yCounter += ySilhouetteCoordinates.get(i);
       numberCoordinatesSilhouette++;
-    }
+    // }
   }
   // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
   if(numberCoordinatesSilhouette > 50) {
@@ -146,6 +150,7 @@ void updateCenterOfMass() {
     ySilhouetteCoordinates.clear();
     numberCoordinatesSilhouette = 0;
   }
+  // println(centerOfMass_x, centerOfMass_y);
 }
 
 void showCenterOfMass() {
