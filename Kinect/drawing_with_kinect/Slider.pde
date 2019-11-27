@@ -2,9 +2,13 @@
 
 class Slider {
   // variables
-  float colorBarWidth = width / 2;
-  float sliderXPos = width/2;
+  int colorBarWidth = width / 2;
+  int colorBarHeight =50;
+  int sliderXPos = width/2;
   float colourVal = map(sliderXPos, 0.0, colorBarWidth, 0.0, 255.0);
+  int sliderX = width/4;
+  int sliderY = 10;
+  
 
   // constructor
   Slider() {}
@@ -12,7 +16,7 @@ class Slider {
   void update() { // this is like draw
     this.calculateCenterOfMass();
     if(showToolbar) {
-      colourVal = updateSlider((width / 4), 0, colorBarWidth, 50.0, colourVal);
+      colourVal = updateSlider(sliderX, sliderY, colorBarWidth, colorBarHeight, colourVal);
     }
   }
   
