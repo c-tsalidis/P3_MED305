@@ -34,10 +34,10 @@ class Slider {
     stroke(100);
     hueVal = map(sliderPosition, 0.0, sliderW, 0.0, 255.0);
     fill(hueVal, 255, 255);
-    rect(sliderPosition + xPos - 3, yPos - 5, 6, sliderH + 10);
+    rect(sliderPosition + xPos - 3, yPos - 5, 20, sliderH + 10);
     // rect(sliderW + 40, yPos, sliderH, sliderH); // rectangle telling the user what color it is
     noStroke();
-    currentDrawingColor = color(hueVal,255,255);
+    if(!isErasing) currentDrawingColor = color(hueVal,255,255);
     return hueVal;
   }
   
@@ -64,7 +64,7 @@ class Slider {
       }
     }
     // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
-    if(numberCoordinatesSilhouette > 50) {
+    if(numberCoordinatesSilhouette > noiseFilter) {
       centerOfMass_x = xSum / numberCoordinatesSilhouette;
       centerOfMass_y = ySum / numberCoordinatesSilhouette;
       numberCoordinatesSilhouette = 0;

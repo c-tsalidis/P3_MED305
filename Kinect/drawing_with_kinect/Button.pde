@@ -36,10 +36,8 @@ class Button {
           if(isErasing) {
             previousColor = currentDrawingColor;
             currentDrawingColor = backgroundColor;
-            println("Erasing");
           } else {
             currentDrawingColor = previousColor;
-            println("Not erasing");
           }
         }
       }
@@ -47,7 +45,12 @@ class Button {
         if (!hasEnteredPipet) {
           isPipetting = !isPipetting;
           hasEnteredPipet = true;
-          println("Pipetting");
+          if(isPipetting) {
+            println("Pipetting: " + pipetX + "," + pipetY);
+          }
+          else {
+            println("Not pipetting");
+          }
         }
       }
     }
@@ -94,7 +97,7 @@ class Button {
       }
     }
     // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
-    if (numberCoordinatesSilhouette > 50) {
+    if (numberCoordinatesSilhouette > noiseFilter) {
       centerOfMass_x = xSum / numberCoordinatesSilhouette;
       centerOfMass_y = ySum / numberCoordinatesSilhouette;
       numberCoordinatesSilhouette = 0;
