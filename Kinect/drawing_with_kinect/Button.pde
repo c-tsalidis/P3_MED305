@@ -45,12 +45,8 @@ class Button {
         if (!hasEnteredPipet) {
           isPipetting = !isPipetting;
           hasEnteredPipet = true;
-          if(isPipetting) {
-            println("Pipetting: " + pipetX + "," + pipetY);
-          }
-          else {
-            println("Not pipetting");
-          }
+          if(isPipetting) println("Pipetting");
+          else println("Not pipetting");
         }
       }
     }

@@ -67,10 +67,16 @@ void draw() {
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
-  toolbar.update();
   calculatePipetCenterOfMass();
-  ellipse(pipetX, pipetY, 30, 30);
-  println(pipetX, pipetY);
+  if(isPipetting) {
+    color newColor = color(get((int)pipetX, (int)pipetY));
+    previousColor = currentDrawingColor;
+    currentDrawingColor = newColor;// pixel color corresponding to x and y
+    println(currentDrawingColor);
+  }
+  else currentDrawingColor = previousColor;
+  toolbar.update();
+  // ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
   xSilhouetteCoordinates.clear();
   ySilhouetteCoordinates.clear();
@@ -115,6 +121,7 @@ void drawSilhouette(float x, float y) {
 }
 
 void makeDrawing(float x, float y) {
+  if(isPipetting) return;
   fill(currentDrawingColor);
   ellipse(x, y, 5, 5); // create an ellipse for showing the hands (what the user is currently drawing)
 }
@@ -151,8 +158,9 @@ void calculatePipetCenterOfMass() {
     centerOfMass_y = mouseY;
     return;
   }
-  int min = 0;
-  int index = 0;
+  int min;
+  if(closestDepths.size() > 0) min = closestDepths.max();
+  else min = 0;
   for(int i = 0; i < closestDepths.size(); i++) {
     if(closestDepths.get(i) < min) {
       min = closestDepths.get(i);
