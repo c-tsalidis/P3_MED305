@@ -2,7 +2,7 @@ class Button {
   // variables
   int x, y, bWidth, bHeight;
   boolean isEraser, isPipet, isToolbarButton;
-  boolean hasEntered = false;
+  boolean hasEnteredEraser = false, hasEnteredPipet = false, hasEnteredToolbarButton = false;
   String text;
   PImage image;
 
@@ -22,26 +22,39 @@ class Button {
   void update() {
     this.display();
     this.calculateCenterOfMass();
-    if (this.centerOfMassisInsideHitbox()) {
-      if (!hasEntered) {
-        if (this.isEraser) {
-          // if (currentDrawingColor != backgroundColor) currentDrawingColor = backgroundColor;
-          // else currentDrawingColor = previousColor;
-          isErasing = !isErasing;
-          // println("is erasing: "+ isErasing);
-        } else if (this.isPipet) {
-          // the user is selecting color from the drawing
-          isPipetting = !isPipetting;
-          // println("is pipetting: " + isPipetting);
-        } else if (this.isToolbarButton) {
-          // the user wants to either show or hide the tool bar
+    if (this.centerOfMassInsideHitbox()) {
+      if (this.isToolbarButton) {
+        if (!hasEnteredToolbarButton) {
           showToolbar = !showToolbar;
-          // println("isShowing toolbar: " + showToolbar);
+          hasEnteredToolbarButton = true;
         }
-        hasEntered = true;
       }
-    } else {
-      hasEntered = false;
+      else if (this.isEraser) {
+        if (!hasEnteredEraser) {
+          isErasing = !isErasing;
+          hasEnteredEraser = true;
+          if(isErasing) {
+            previousColor = currentDrawingColor;
+            currentDrawingColor = backgroundColor;
+            println("Erasing");
+          } else {
+            currentDrawingColor = previousColor;
+            println("Not erasing");
+          }
+        }
+      }
+      else if (this.isPipet) {
+        if (!hasEnteredPipet) {
+          isPipetting = !isPipetting;
+          hasEnteredPipet = true;
+          println("Pipetting");
+        }
+      }
+    }
+    else {
+      hasEnteredEraser = false;
+      hasEnteredPipet = false;
+      hasEnteredToolbarButton = false;
     }
   }
 
@@ -57,8 +70,8 @@ class Button {
       return true;
     } else return false;
   }
-  
-  boolean centerOfMassisInsideHitbox() {
+
+  boolean centerOfMassInsideHitbox() {
     if (centerOfMass_x > this.x && centerOfMass_x < (this.x + this.bWidth) &&
       centerOfMass_y > this.y && centerOfMass_y < (this.y + this.bHeight)) {
       return true;
@@ -66,22 +79,22 @@ class Button {
   }
 
   void calculateCenterOfMass() {
-    if(isMouseControlled) { 
+    if (isMouseControlled) { 
       centerOfMass_x = mouseX;
       centerOfMass_y = mouseY;
       return;
     }
     int numberCoordinatesSilhouette = 0; // the number of coordinates of the silhouette that are inside of this button's hitbox
     int xSum = 0, ySum = 0;
-    for(int i = 0; i < xSilhouetteCoordinates.size(); i++) {
-      if(isInsideHitbox(xSilhouetteCoordinates.get(i), ySilhouetteCoordinates.get(i))) {
+    for (int i = 0; i < xSilhouetteCoordinates.size(); i++) {
+      if (isInsideHitbox(xSilhouetteCoordinates.get(i), ySilhouetteCoordinates.get(i))) {
         xSum += xSilhouetteCoordinates.get(i);
         ySum += ySilhouetteCoordinates.get(i);
         numberCoordinatesSilhouette++;
       }
     }
     // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
-    if(numberCoordinatesSilhouette > 5) {
+    if (numberCoordinatesSilhouette > 50) {
       centerOfMass_x = xSum / numberCoordinatesSilhouette;
       centerOfMass_y = ySum / numberCoordinatesSilhouette;
       numberCoordinatesSilhouette = 0;

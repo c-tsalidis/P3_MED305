@@ -64,7 +64,7 @@ class Slider {
       }
     }
     // to avoid dividing by zero, and to avoid noise, check if the number of coordinates in the silhouette is higher number than this value
-    if(numberCoordinatesSilhouette > 5) {
+    if(numberCoordinatesSilhouette > 50) {
       centerOfMass_x = xSum / numberCoordinatesSilhouette;
       centerOfMass_y = ySum / numberCoordinatesSilhouette;
       numberCoordinatesSilhouette = 0;

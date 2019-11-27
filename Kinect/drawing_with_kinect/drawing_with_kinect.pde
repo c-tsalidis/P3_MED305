@@ -66,6 +66,8 @@ void draw() {
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
   xSilhouetteCoordinates.clear();
   ySilhouetteCoordinates.clear();
+  centerOfMass_x = 0;
+  centerOfMass_y = 0;
 }
 
 void processDepth() {
