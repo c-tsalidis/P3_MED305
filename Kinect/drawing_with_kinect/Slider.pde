@@ -2,22 +2,26 @@
 
 class Slider {
   // variables
-  int colorBarWidth = width / 2;
-  int colorBarHeight =50;
+  int colorBarWidth;
+  int colorBarHeight;
   int sliderXPos = width/2;
   float colourVal = map(sliderXPos, 0.0, colorBarWidth, 0.0, 255.0);
-  int sliderX = width/4;
+  int sliderX;
   int sliderY = 10;
 
 
   // constructor
   Slider() {
+
   }
 
   void update() { // this is like draw
     this.calculateCenterOfMass();
     if (showToolbar) {
       updateSlider(sliderX, sliderY, colorBarWidth, colorBarHeight, colourVal);
+            colorBarWidth = width-toolbar.eraser.bWidth-toolbar.toolbarButton.bWidth-10;
+      sliderX = toolbar.eraser.bWidth+10;
+      colorBarHeight = toolbar.tHeight-toolbar.tHeight/3;
     }
   }
 
