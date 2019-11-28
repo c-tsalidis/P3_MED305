@@ -60,7 +60,7 @@ void setup() {
   smooth(8);
   noStroke(); // get rid of strokes to whatever is being drawn
   backgroundImage = createImage(width, height, RGB);
-  currentDrawingColor = color(0, 255, 0); // by default make the drawing color red
+  currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
   previousColor = currentDrawingColor;
   toolbar = new Toolbar();
 }
@@ -101,7 +101,7 @@ void draw() {
   rect(50, height - 50, 100, 50);
   fill(0);
   // textAlign(CENTER);
-  text(feedback, 50, height - 50, 50, 25);
+  text(feedback, 50, height - 50, 50, 25);  
 }
 
 void processDepth() {
