@@ -43,6 +43,7 @@ class Button {
           }
         }
       }
+      /*
       else if (this.isPipet) {
         if (!hasEnteredPipet) {
           isPipetting = !isPipetting;
@@ -57,17 +58,18 @@ class Button {
           }
         }
       }
+      */
     }
     else {
       hasEnteredEraser = false;
-      hasEnteredPipet = false;
+      // hasEnteredPipet = false;
       hasEnteredToolbarButton = false;
     }
   }
 
   void display() {
-    fill(255);
-    rect( this.x, this.y, this.bWidth, this.bHeight);
+    // fill(255);
+    // rect( this.x, this.y, this.bWidth, this.bHeight);
     image(this.image, this.x, this.y, this.bWidth, this.bHeight);
   }
 
@@ -84,7 +86,7 @@ class Button {
       return true;
     } else return false;
   }
-
+  
   void calculateCenterOfMass() {
     if (isMouseControlled) { 
       centerOfMass_x = mouseX;

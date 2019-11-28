@@ -7,7 +7,7 @@ int minSilhouetteThreshold = 700;
 int maxSilhouetteThreshold = 1500;
 
 // drawing threshold
-int minDrawingThreshold = 100;
+int minDrawingThreshold = 25;
 int maxDrawingThreshold = 900;
 
 color currentDrawingColor;
@@ -72,6 +72,7 @@ void draw() {
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
+  /*
   calculatePipetCenterOfMass();
   if(isPipetting) {
     pipetColor = color(get((int)pipetX, (int)pipetY));
@@ -81,10 +82,11 @@ void draw() {
   float r  = red(currentDrawingColor);
   float g  = green(currentDrawingColor);
   float b  = blue(currentDrawingColor);
-  println(r,g,b);
+  // println(r,g,b);
   // else currentDrawingColor = previousColor;
+  */
   toolbar.update();
-  ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
+  // ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
   xSilhouetteCoordinates.clear();
   ySilhouetteCoordinates.clear();

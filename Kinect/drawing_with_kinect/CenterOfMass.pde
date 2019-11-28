@@ -1,0 +1,4 @@
+class CenterOfMass {
+  // variables
+  CenterOfMass() {}
+}
