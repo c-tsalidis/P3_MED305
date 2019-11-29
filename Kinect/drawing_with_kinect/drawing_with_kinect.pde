@@ -71,7 +71,7 @@ void setup() {
 void draw() {
   colorMode(RGB);
   image(backgroundImage, 0, 0);
-  reduceNoise();
+  // reduceNoise();
   /*
   if(framesCounter > frameRate / 100) {
     reduceNoise();
@@ -245,8 +245,8 @@ void reduceNoise() {
    // caclulate the sum of the elements that are colored (neither black or white)
    // to go through the nwighbouring elements, go through a kernel with a skip
   reducedNoiseImg.loadPixels();
-   for(int x = skip; x < current.width - skip; x+=2) {
-     for(int y = skip; y < current.height - skip; y+=2) {
+   for(int x = skip; x < current.width - skip; x+=1) {
+     for(int y = skip; y < current.height - skip; y+=1) {
        int sum = 0; // the sum of all the elements of the kernel that are not white or black
        int pos = x + y * current.width;
        for(int kx = -skip; kx <= skip; kx++) {
@@ -262,7 +262,8 @@ void reduceNoise() {
        if(sum < (3*3)) reducedNoiseImg.pixels[pos] = backgroundColor;
        else {
          reducedNoiseImg.pixels[pos] = current.pixels[pos];
-         // if()
+         reducedNoiseImg.pixels[pos - 1] = current.pixels[pos];
+         reducedNoiseImg.pixels[pos + 1] = current.pixels[pos];
        }
      }
    }
@@ -276,11 +277,11 @@ int [] cleanDepthValues(int [] depth) {
     int [] a = new int[5];
     // int [] a = new int[3];
     int median = 0;
-    a[0] = i - 2;
-    a[1] = i - 1;
-    a[2] = i;
-    a[3] = i + 1;
-    a[4] = i + 2;
+    a[0] = depth[i - 2];
+    a[1] = depth[i - 1];
+    a[2] = depth[i];
+    a[3] = depth[i + 1];
+    a[4] = depth[i + 2];
     /*
     a[0] = i - 1;
      a[1] = i;
@@ -288,14 +289,22 @@ int [] cleanDepthValues(int [] depth) {
      */
     int max = 0;
     for (int j = 0; j < a.length - 1; j++) {
-      if (abs(a[j] - a[j+1]) > max) max = abs(a[j] - a[j+1]);
+      // if (abs(a[j] - a[j+1]) > max) max = abs(a[j] - a[j+1]);
+      if(a[j] > max) {
+        max = a[j];
+        // println(a[j]," is higher than", max);
+      }
     }
     int difference = max;
-    if (abs(a[0]-a[1]) > difference || abs(a[1]-a[2]) > difference || abs(a[2]-a[3]) > difference || abs(a[3]-a[4]) > difference) { 
+    // if (abs(a[0]-a[1]) > difference || abs(a[1]-a[2]) > difference || abs(a[2]-a[3]) > difference || abs(a[3]-a[4]) > difference) { 
       a = sort(a);
       median = a[2];
-      depth[i] = median;
-    }
+     if(max > median) {
+       depth[i] = median;
+       // println("Very big difference");
+     }
+      // depth[i] = median;
+    // }
   }
   return depth;
 }
