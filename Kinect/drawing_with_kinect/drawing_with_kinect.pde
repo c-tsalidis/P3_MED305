@@ -272,39 +272,44 @@ void reduceNoise() {
 }
 
 int [] cleanDepthValues(int [] depth) {
-  for (int i = 2; i < (depth.length - 2); i++) {
-    // for(int i = depth.length - 2; i > (2); i--) {
-    int [] a = new int[5];
-    // int [] a = new int[3];
-    int median = 0;
+  int amountValuesToCompare = 5;
+  int skip = int(amountValuesToCompare / 2);
+  for (int i = skip; i < (depth.length - skip); i++) {
+    int [] a = new int[amountValuesToCompare];
+    int median = 0, max = 0;
+    /*
+    for(int j = 0; j < a.length; j++) {
+      for(int t = -skip; t < skip; t++) {
+        a[j] = depth[j + t];
+      }
+    }
+    */
+    
     a[0] = depth[i - 2];
     a[1] = depth[i - 1];
     a[2] = depth[i];
     a[3] = depth[i + 1];
     a[4] = depth[i + 2];
+    
     /*
-    a[0] = i - 1;
-     a[1] = i;
-     a[2] = i+1;
-     */
-    int max = 0;
+    a[0] = depth[i - 3];
+    a[1] = depth[i - 2];
+    a[2] = depth[i - 1];
+    a[3] = depth[i];
+    a[4] = depth[i + 1];
+    a[5] = depth[i + 2];
+    a[6] = depth[i + 3];
+    */
     for (int j = 0; j < a.length - 1; j++) {
-      // if (abs(a[j] - a[j+1]) > max) max = abs(a[j] - a[j+1]);
       if(a[j] > max) {
         max = a[j];
-        // println(a[j]," is higher than", max);
       }
     }
-    int difference = max;
-    // if (abs(a[0]-a[1]) > difference || abs(a[1]-a[2]) > difference || abs(a[2]-a[3]) > difference || abs(a[3]-a[4]) > difference) { 
-      a = sort(a);
-      median = a[2];
-     if(max > median) {
-       depth[i] = median;
-       // println("Very big difference");
-     }
-      // depth[i] = median;
-    // }
+    a = sort(a);
+    median = a[skip];
+   if(max > (median * 5)) {
+     depth[i] = median;
+   }
   }
   return depth;
 }
