@@ -26,9 +26,9 @@ class Toolbar {
   }
   
   void update() {
-    stroke(255);
-    line(0, this.tHeight, width, this.tHeight);
-    noStroke();
+    // stroke(255);
+    // line(0, this.tHeight, width, this.tHeight);
+    // noStroke();
     // update sliders and buttons
     toolbarButton.update(); // always show the toolbar button
     // only show the toolbar if the user selected it

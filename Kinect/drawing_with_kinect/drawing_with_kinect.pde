@@ -3,12 +3,12 @@ import org.openkinect.processing.*;
 Kinect2 kinect;
 
 // silhouette thresholds
-int minSilhouetteThreshold = 700;
-int maxSilhouetteThreshold = 1500;
+int minSilhouetteThreshold = 1200;
+int maxSilhouetteThreshold = 2000;
 
 // drawing threshold
-int minDrawingThreshold = 25;
-int maxDrawingThreshold = 900;
+int minDrawingThreshold = 500;
+int maxDrawingThreshold = 1500;
 
 color currentDrawingColor;
 color previousColor;
@@ -38,7 +38,7 @@ int colorPalettesWidth;
 
 boolean isMouseControlled = false;
 
-int noiseFilter = 50;
+int noiseFilter = 100;
 
 Toolbar toolbar;
 
@@ -49,6 +49,8 @@ boolean isErasing = false, isPipetting = false, showToolbar = false;
 float pipetX, pipetY;
 
 color pipetColor;
+
+int framesCounter;
 
 // runs once
 void setup() {
@@ -69,22 +71,29 @@ void setup() {
 void draw() {
   colorMode(RGB);
   image(backgroundImage, 0, 0);
+  reduceNoise();
+  /*
+  if(framesCounter > frameRate / 100) {
+    reduceNoise();
+    framesCounter = 0;
+  }
+  */
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
-  showCenterOfMass(); // draw the center of mass - for testing purposes 
+  // showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
   /*
   calculatePipetCenterOfMass();
-  if(isPipetting) {
-    pipetColor = color(get((int)pipetX, (int)pipetY));
-    previousColor = currentDrawingColor;
-    currentDrawingColor = pipetColor;// pixel color corresponding to x and y
-  }
-  float r  = red(currentDrawingColor);
-  float g  = green(currentDrawingColor);
-  float b  = blue(currentDrawingColor);
-  // println(r,g,b);
-  // else currentDrawingColor = previousColor;
-  */
+   if(isPipetting) {
+   pipetColor = color(get((int)pipetX, (int)pipetY));
+   previousColor = currentDrawingColor;
+   currentDrawingColor = pipetColor;// pixel color corresponding to x and y
+   }
+   float r  = red(currentDrawingColor);
+   float g  = green(currentDrawingColor);
+   float b  = blue(currentDrawingColor);
+   // println(r,g,b);
+   // else currentDrawingColor = previousColor;
+   */
   toolbar.update();
   // ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
@@ -95,17 +104,23 @@ void draw() {
   yClosestDepthCoord.clear();
   centerOfMass_x = width * 2;
   centerOfMass_y = height * 2;
-  
+
   // feedback for tool slected
   fill(255);
   rect(50, height - 50, 100, 50);
   fill(0);
   // textAlign(CENTER);
-  text(feedback, 50, height - 50, 50, 25);  
+  text(feedback, 50, height - 50, 50, 25);
+
+  // PImage depthImg = kinect.getDepthImage();
+  // image(depthImg, 0, 0);
+  framesCounter++;
 }
 
 void processDepth() {
   int [] depth = kinect.getRawDepth(); // get the depth values ranging from 0-4500 from the kinect
+  depth = cleanDepthValues(depth);
+
   int skip = 1;
   int closestCounter = 0; // for counting the closest depth values to the kinect
   for (int x = 0; x < kinect.depthWidth; x += skip) {
@@ -118,7 +133,7 @@ void processDepth() {
       if (d > minSilhouetteThreshold && d < maxSilhouetteThreshold) drawSilhouette(_x, _y);
       else if (d > minDrawingThreshold && d < maxDrawingThreshold) {
         makeDrawing(_x, _y);
-        if(closestCounter > noiseFilter) {
+        if (closestCounter > noiseFilter) {
           closestDepths.append(d);
           xClosestDepthCoord.add(_x);
           yClosestDepthCoord.add(_y);
@@ -137,7 +152,7 @@ void drawSilhouette(float x, float y) {
 }
 
 void makeDrawing(float x, float y) {
-  if(isPipetting) return;
+  if (isPipetting) return;
   fill(currentDrawingColor);
   ellipse(x, y, 5, 5); // create an ellipse for showing the hands (what the user is currently drawing)
 }
@@ -161,29 +176,128 @@ void updateBackgroundImage() {
 }
 
 void updateCurrentDrawingColor() {
-  for(int i = 0; i < numColors; i++) {
-    if(centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
+  for (int i = 0; i < numColors; i++) {
+    if (centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
   }
 }
 
 
 void calculatePipetCenterOfMass() {
-  if(!isPipetting) return;
+  if (!isPipetting) return;
   if (isMouseControlled) { 
     centerOfMass_x = mouseX;
     centerOfMass_y = mouseY;
     return;
   }
   int min;
-  if(closestDepths.size() > 0) min = closestDepths.max();
+  if (closestDepths.size() > 0) min = closestDepths.max();
   else min = 0;
-  for(int i = 0; i < closestDepths.size(); i++) {
-    if(closestDepths.get(i) < min) {
+  for (int i = 0; i < closestDepths.size(); i++) {
+    if (closestDepths.get(i) < min) {
       min = closestDepths.get(i);
       pipetX = xClosestDepthCoord.get(i);
       pipetY = yClosestDepthCoord.get(i);
     }
   }
+}
+
+void reduceNoise() {
+  PImage current = get();
+  PImage dilated = createImage(width, height, RGB);
+  PImage reducedNoiseImg = createImage(width, height, RGB);
+  float threshold = 127;
+  /*
+  dilated.loadPixels();
+
+  //--------------------------THRESHOLD
+  for (int x = 0; x < current.width; x++ ) {
+    for (int y = 0; y < current.height; y++ ) {
+      int loc = x + y*current.width;
+      // Test the brightness against the threshold
+      if (brightness(current.pixels[loc]) > threshold) {
+        dilated.pixels[loc] = color(255); // White
+      } else {
+        dilated.pixels[loc] = color(0);   // Black
+      }
+    }
+  }
+//--------------------------DILATION 3x3
+   for (int y = 1; y < current.height-1; y++) { // Skip top and bottom edges
+   for (int x = 1; x < current.width-1; x++) { // Skip left and right edges
+   float sum = 0; // Kernel sum for this pixel
+   for (int ky = -1; ky <= 1; ky++) {
+   for (int kx = -1; kx <= 1; kx++) {
+   // Calculate the adjacent pixel for this kernel point
+   int pos = (y + ky)*current.width + (x + kx);
+   // Multiply adjacent pixels based on the kernel values
+   sum += brightness(current.pixels[pos])/255;
+   }
+   }
+   if(sum >= 1) dilated.pixels[y*current.width + x] = color(255,255,255);
+   else dilated.pixels[y*current.width + x] = color(0,0,0);
+   }
+   }
+  dilated.updatePixels();
+  */
+  int skip = 1;
+  // to avoid the noise 
+   // Go though all the neighbouring pixels to the current pixel in the for loops
+   // caclulate the sum of the elements that are colored (neither black or white)
+   // to go through the nwighbouring elements, go through a kernel with a skip
+  reducedNoiseImg.loadPixels();
+   for(int x = skip; x < current.width - skip; x+=2) {
+     for(int y = skip; y < current.height - skip; y+=2) {
+       int sum = 0; // the sum of all the elements of the kernel that are not white or black
+       int pos = x + y * current.width;
+       for(int kx = -skip; kx <= skip; kx++) {
+         for(int ky = -skip; ky <= skip; ky++) {
+           // calculate the neighbouring point to the current pixel
+           int loc = (x + kx) + (y + ky)*current.width;
+           if(current.pixels[loc] != color(0) && current.pixels[loc] != color(255)) { // it means that this pixel is colored
+             sum++;
+           }
+         }
+       }
+       // if the sum is not 9 (the total amount of neighbouring elements) it means that this pixel should be set to the background color
+       if(sum < (3*3)) reducedNoiseImg.pixels[pos] = backgroundColor;
+       else {
+         reducedNoiseImg.pixels[pos] = current.pixels[pos];
+         // if()
+       }
+     }
+   }
+   reducedNoiseImg.updatePixels();
+   image(reducedNoiseImg, 0, 0);
+}
+
+int [] cleanDepthValues(int [] depth) {
+  for (int i = 2; i < (depth.length - 2); i++) {
+    // for(int i = depth.length - 2; i > (2); i--) {
+    int [] a = new int[5];
+    // int [] a = new int[3];
+    int median = 0;
+    a[0] = i - 2;
+    a[1] = i - 1;
+    a[2] = i;
+    a[3] = i + 1;
+    a[4] = i + 2;
+    /*
+    a[0] = i - 1;
+     a[1] = i;
+     a[2] = i+1;
+     */
+    int max = 0;
+    for (int j = 0; j < a.length - 1; j++) {
+      if (abs(a[j] - a[j+1]) > max) max = abs(a[j] - a[j+1]);
+    }
+    int difference = max;
+    if (abs(a[0]-a[1]) > difference || abs(a[1]-a[2]) > difference || abs(a[2]-a[3]) > difference || abs(a[3]-a[4]) > difference) { 
+      a = sort(a);
+      median = a[2];
+      depth[i] = median;
+    }
+  }
+  return depth;
 }
 
 void keyPressed() {
