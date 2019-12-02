@@ -19,8 +19,8 @@ class Slider {
     this.calculateCenterOfMass();
     if (showToolbar) {
       updateSlider(sliderX, sliderY, colorBarWidth, colorBarHeight, colourVal);
-            colorBarWidth = width-toolbar.eraser.bWidth-toolbar.toolbarButton.bWidth-10;
-      sliderX = toolbar.eraser.bWidth+10;
+            colorBarWidth = width-toolbar.eraser.bWidth-toolbar.toolbarButton.bWidth-100;
+      sliderX = toolbar.eraser.bWidth+50;
       colorBarHeight = toolbar.tHeight-toolbar.tHeight/3;
     }
   }

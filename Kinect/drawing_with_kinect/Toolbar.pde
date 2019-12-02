@@ -1,8 +1,8 @@
 class Toolbar {
   // variables
   Slider slider; // creating the slider
-  Button eraser, toolbarButton; // creating the buttons
-  PImage eraserImg, pipetImg, toolbarImg;
+  Button eraser, toolbarButton, toolbarInactiveButton, eraserInactive; // creating the buttons
+  PImage eraserImg, pipetImg, toolbarImg, toolbarInactiveImg, eraserInactiveImg;
   int tHeight = 75;
   
   // constructor
@@ -10,19 +10,35 @@ class Toolbar {
     // initializing the slider
     slider = new Slider();
     // initializing the buttons
+
     eraserImg = loadImage("eraser.png");
+    eraserInactiveImg = loadImage("eraserInactive.png");
+
+     //eraserImg = loadImage("eraserInactive.png"); 
+    
     // pipetImg = loadImage("pipette.png");
+    
     toolbarImg = loadImage("hand.png");
+    toolbarInactiveImg = loadImage("handInactive.png");
+    
+   
     // imageThreshold(eraserImg);
     // imageThreshold(toolbarImg);
     eraser = new Button(0, 0, 100, 50, true, false, false, "Eraser", eraserImg);
     eraser.bWidth = this.tHeight;
     eraser.bHeight = this.tHeight;
+    eraserInactive = new Button(0, 0, 100, 50, true, false, false, "EraserInactive", eraserInactiveImg);
+    eraserInactive.bWidth = this.tHeight;
+    eraserInactive.bHeight = this.tHeight;
     // pipet = new Button(100, 0, 100, 50, false, true, false, "pipet", pipetImg);
     toolbarButton = new Button(width - 100, 0, 100, 50, false, false, true, "Toolbar", toolbarImg);
     toolbarButton.bWidth = this.tHeight;
     toolbarButton.bHeight = this.tHeight;
     toolbarButton.x = width - toolbarButton.bWidth;
+    toolbarInactiveButton = new Button(width - 100, 0, 100, 50, false, false, true, "ToolbarInactive", toolbarInactiveImg);
+    toolbarInactiveButton.bWidth = this.tHeight;
+    toolbarInactiveButton.bHeight = this.tHeight;
+    toolbarInactiveButton.x = width - toolbarButton.bWidth;
   }
   
   void update() {
@@ -30,12 +46,21 @@ class Toolbar {
     // line(0, this.tHeight, width, this.tHeight);
     // noStroke();
     // update sliders and buttons
-    toolbarButton.update(); // always show the toolbar button
+    if(showToolbar==false){
+    toolbarInactiveButton.update(); // always show the toolbar button
+    //isErasing=false;
+    }
+    if(showToolbar && isErasing == false){
+            eraserInactive.update();
+    }
     // only show the toolbar if the user selected it
     if(showToolbar) {
       slider.update();
-      eraser.update();
+      toolbarButton.update();
       // pipet.update();
+    } 
+    if(showToolbar && isErasing){
+      eraser.update();
     }
   }
   
