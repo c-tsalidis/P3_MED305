@@ -4,7 +4,7 @@ class Slider {
   // variables
   int colorBarWidth;
   int colorBarHeight;
-  int sliderXPos = width/2;
+  int sliderXPos = width / 2;
   float colourVal = map(sliderXPos, 0.0, colorBarWidth, 0.0, 255.0);
   int sliderX;
   int sliderY = 10;
@@ -16,8 +16,8 @@ class Slider {
     this.calculateCenterOfMass();
     if (showToolbar) {
       updateSlider(sliderX, sliderY, colorBarWidth, colorBarHeight, colourVal);
-            colorBarWidth = width-toolbar.eraser.bWidth-toolbar.toolbarButton.bWidth-100;
-      sliderX = toolbar.eraser.bWidth+50;
+            colorBarWidth = width-toolbar.eraser.bWidth-toolbar.toolbarButton.bWidth-200;
+      sliderX = toolbar.eraser.bWidth+100;
       colorBarHeight = toolbar.tHeight-toolbar.tHeight/3;
     }
   }
@@ -47,7 +47,8 @@ class Slider {
   boolean isInsideHitbox(float x, float y) {
     if (x > ((width / 2) - (colorBarWidth / 2)) && x < ((width / 2) - (colorBarWidth / 2) + this.colorBarWidth) &&
       y > 0 && y < (50)) {
-      return true;
+        isErasing = false;
+        return true;
     } else return false;
   }
 

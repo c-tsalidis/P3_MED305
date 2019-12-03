@@ -33,7 +33,11 @@ class Toolbar {
       if(isErasing) eraser.image = eraserImg;
       else eraser.image = eraserInactiveImg;
     }
-    else toolbarButton.image = toolbarInactiveImg;
+    else {
+      toolbarButton.image = toolbarInactiveImg;
+      isErasing = false;
+      currentDrawingColor = previousColor;
+    }
   }
   
   void imageThreshold(PImage image) {

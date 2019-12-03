@@ -118,7 +118,7 @@ void drawSilhouette(float x, float y) {
   xSilhouetteCoordinates.add(x);
   ySilhouetteCoordinates.add(y);
   fill(silhouetteColor);
-  rect(x, y, 2, 2); // create a rectangle for showing the silhoutte of the user
+  rect(x, y, 1, 1); // create a rectangle for showing the silhoutte of the user
 }
 
 void makeDrawing(float x, float y) {
