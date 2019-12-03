@@ -1,4 +1,0 @@
-class CenterOfMass {
-  // variables
-  CenterOfMass() {}
-}

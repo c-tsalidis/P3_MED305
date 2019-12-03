@@ -36,40 +36,19 @@ class Button {
           if(isErasing) {
             previousColor = currentDrawingColor;
             currentDrawingColor = backgroundColor;
-            feedback = "Eraser";
           } else {
             currentDrawingColor = previousColor;
-            feedback = "feedback";
           }
         }
       }
-      /*
-      else if (this.isPipet) {
-        if (!hasEnteredPipet) {
-          isPipetting = !isPipetting;
-          hasEnteredPipet = true;
-          if(isPipetting) {
-            println("Pipetting");
-            feedback = "pipet";
-          }
-          else {
-            println("Not pipetting");
-            feedback = "feedback";
-          }
-        }
-      }
-      */
     }
     else {
       hasEnteredEraser = false;
-      // hasEnteredPipet = false;
       hasEnteredToolbarButton = false;
     }
   }
 
   void display() {
-    // fill(255);
-    // rect( this.x, this.y, this.bWidth, this.bHeight);
     image(this.image, this.x, this.y, this.bWidth, this.bHeight);
   }
 

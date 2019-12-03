@@ -3,7 +3,7 @@ import org.openkinect.processing.*;
 Kinect2 kinect;
 
 // silhouette thresholds
-int minSilhouetteThreshold = 1200;
+int minSilhouetteThreshold = 1000;
 int maxSilhouetteThreshold = 2000;
 
 // drawing threshold
@@ -38,12 +38,9 @@ int colorPalettesWidth;
 
 boolean isMouseControlled = false;
 
-int noiseFilter = 100;
+int noiseFilter = 50;
 
 Toolbar toolbar;
-
-String feedback = "feedback";
-
 boolean isErasing = false, isPipetting = false, showToolbar = false;
 
 float pipetX, pipetY;
@@ -71,29 +68,9 @@ void setup() {
 void draw() {
   colorMode(RGB);
   image(backgroundImage, 0, 0);
-  // reduceNoise();
-  /*
-  if(framesCounter > frameRate / 100) {
-    reduceNoise();
-    framesCounter = 0;
-  }
-  */
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
   // showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
-  /*
-  calculatePipetCenterOfMass();
-   if(isPipetting) {
-   pipetColor = color(get((int)pipetX, (int)pipetY));
-   previousColor = currentDrawingColor;
-   currentDrawingColor = pipetColor;// pixel color corresponding to x and y
-   }
-   float r  = red(currentDrawingColor);
-   float g  = green(currentDrawingColor);
-   float b  = blue(currentDrawingColor);
-   // println(r,g,b);
-   // else currentDrawingColor = previousColor;
-   */
   toolbar.update();
   // ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
@@ -104,13 +81,6 @@ void draw() {
   yClosestDepthCoord.clear();
   centerOfMass_x = width * 2;
   centerOfMass_y = height * 2;
-
-  // feedback for tool slected
-  fill(255);
-  rect(50, height - 50, 100, 50);
-  fill(0);
-  // textAlign(CENTER);
-  text(feedback, 50, height - 50, 50, 25);
 
   // PImage depthImg = kinect.getDepthImage();
   // image(depthImg, 0, 0);
@@ -203,42 +173,7 @@ void calculatePipetCenterOfMass() {
 
 void reduceNoise() {
   PImage current = get();
-  PImage dilated = createImage(width, height, RGB);
   PImage reducedNoiseImg = createImage(width, height, RGB);
-  float threshold = 127;
-  /*
-  dilated.loadPixels();
-
-  //--------------------------THRESHOLD
-  for (int x = 0; x < current.width; x++ ) {
-    for (int y = 0; y < current.height; y++ ) {
-      int loc = x + y*current.width;
-      // Test the brightness against the threshold
-      if (brightness(current.pixels[loc]) > threshold) {
-        dilated.pixels[loc] = color(255); // White
-      } else {
-        dilated.pixels[loc] = color(0);   // Black
-      }
-    }
-  }
-//--------------------------DILATION 3x3
-   for (int y = 1; y < current.height-1; y++) { // Skip top and bottom edges
-   for (int x = 1; x < current.width-1; x++) { // Skip left and right edges
-   float sum = 0; // Kernel sum for this pixel
-   for (int ky = -1; ky <= 1; ky++) {
-   for (int kx = -1; kx <= 1; kx++) {
-   // Calculate the adjacent pixel for this kernel point
-   int pos = (y + ky)*current.width + (x + kx);
-   // Multiply adjacent pixels based on the kernel values
-   sum += brightness(current.pixels[pos])/255;
-   }
-   }
-   if(sum >= 1) dilated.pixels[y*current.width + x] = color(255,255,255);
-   else dilated.pixels[y*current.width + x] = color(0,0,0);
-   }
-   }
-  dilated.updatePixels();
-  */
   int skip = 1;
   // to avoid the noise 
    // Go though all the neighbouring pixels to the current pixel in the for loops
@@ -277,29 +212,11 @@ int [] cleanDepthValues(int [] depth) {
   for (int i = skip; i < (depth.length - skip); i++) {
     int [] a = new int[amountValuesToCompare];
     int median = 0, max = 0;
-    /*
-    for(int j = 0; j < a.length; j++) {
-      for(int t = -skip; t < skip; t++) {
-        a[j] = depth[j + t];
-      }
-    }
-    */
-    
     a[0] = depth[i - 2];
     a[1] = depth[i - 1];
     a[2] = depth[i];
     a[3] = depth[i + 1];
     a[4] = depth[i + 2];
-    
-    /*
-    a[0] = depth[i - 3];
-    a[1] = depth[i - 2];
-    a[2] = depth[i - 1];
-    a[3] = depth[i];
-    a[4] = depth[i + 1];
-    a[5] = depth[i + 2];
-    a[6] = depth[i + 3];
-    */
     for (int j = 0; j < a.length - 1; j++) {
       if(a[j] > max) {
         max = a[j];
@@ -327,5 +244,5 @@ void keyPressed() {
     backgroundImage.updatePixels();
   }
   // if the user presses the 'RIGHT' key on the keyboard, then save the current frame to the device as a .png file
-  if (keyCode == RIGHT) saveFrame("Drawing-######.png");
+  if (keyCode == RIGHT) saveFrame("data/Drawing-######.png");
 }

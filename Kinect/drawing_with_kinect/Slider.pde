@@ -9,11 +9,8 @@ class Slider {
   int sliderX;
   int sliderY = 10;
 
-
   // constructor
-  Slider() {
-
-  }
+  Slider() {}
 
   void update() { // this is like draw
     this.calculateCenterOfMass();
@@ -40,13 +37,11 @@ class Slider {
     hueVal = map(sliderPosition, 0.0, sliderW, 0.0, 255.0);
     fill(hueVal, 255, 255);
     rect(sliderPosition + xPos - 3, yPos - 5, 20, sliderH + 10);
-    // rect(sliderW + 40, yPos, sliderH, sliderH); // rectangle telling the user what color it is
     noStroke();
     if (!isErasing && !isPipetting) {
       currentDrawingColor = color(hueVal, 255, 255);
       colourVal = hueVal;
     }
-    // if (isPipetting) currentDrawingColor = pipetColor;
   }
 
   boolean isInsideHitbox(float x, float y) {
