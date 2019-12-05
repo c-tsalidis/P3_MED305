@@ -60,7 +60,7 @@ void setup() {
   noStroke(); // get rid of strokes to whatever is being drawn
   backgroundImage = createImage(width, height, RGB);
   currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
-  previousColor = currentDrawingColor;
+  // previousColor = currentDrawingColor;
   toolbar = new Toolbar();
 }
 

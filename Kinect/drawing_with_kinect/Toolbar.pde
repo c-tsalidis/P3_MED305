@@ -26,6 +26,7 @@ class Toolbar {
   
   void update() {
     toolbarButton.update();
+    previousColor = currentDrawingColor;
     if(showToolbar) {
       toolbarButton.image = toolbarImg;
       slider.update();
