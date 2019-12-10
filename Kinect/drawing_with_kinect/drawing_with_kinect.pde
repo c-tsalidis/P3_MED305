@@ -60,7 +60,6 @@ void setup() {
   noStroke(); // get rid of strokes to whatever is being drawn
   backgroundImage = createImage(width, height, RGB);
   currentDrawingColor = color(255, 0, 0); // by default make the drawing color red
-  // previousColor = currentDrawingColor;
   toolbar = new Toolbar();
 }
 
@@ -72,7 +71,7 @@ void draw() {
   // showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
   toolbar.update();
-  // ellipse(pipetX, pipetY, 30, 30); // show pipette center of mass
+
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
   xSilhouetteCoordinates.clear();
   ySilhouetteCoordinates.clear();
@@ -82,7 +81,7 @@ void draw() {
   centerOfMass_x = width * 2;
   centerOfMass_y = height * 2;
 
-  // PImage depthImg = kinect.getDepthImage();
+  // PImage depthImg = kinect.getDepthImage(); 
   // image(depthImg, 0, 0);
   framesCounter++;
 }
@@ -122,7 +121,7 @@ void drawSilhouette(float x, float y) {
 }
 
 void makeDrawing(float x, float y) {
-  if (isPipetting) return;
+  if (isPipetting) return; //delete
   fill(currentDrawingColor);
   ellipse(x, y, 5, 5); // create an ellipse for showing the hands (what the user is currently drawing)
 }
@@ -151,7 +150,7 @@ void updateCurrentDrawingColor() {
   }
 }
 
-
+// delete??
 void calculatePipetCenterOfMass() {
   if (!isPipetting) return;
   if (isMouseControlled) { 
@@ -194,7 +193,7 @@ void reduceNoise() {
          }
        }
        // if the sum is not 9 (the total amount of neighbouring elements) it means that this pixel should be set to the background color
-       if(sum < (3*3)) reducedNoiseImg.pixels[pos] = backgroundColor;
+       if(sum < (3*3)) reducedNoiseImg.pixels[pos] = backgroundColor; //3*3 = 9??
        else {
          reducedNoiseImg.pixels[pos] = current.pixels[pos];
          reducedNoiseImg.pixels[pos - 1] = current.pixels[pos];
