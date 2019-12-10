@@ -26,7 +26,7 @@ class Slider {
     float sliderPosition = map(hueVal, 0.0, 255.0, 0.0, sliderW); // find the position of the slider.
     for (int i = 0; i < sliderW; i++) { //draw 1 line for each hueValue from 0-255
       hueVal = map(i, 0.0, sliderW, 0.0, 255.0); //get hueVal for each position in the bar
-      stroke(hueVal, 255, 255);
+      stroke(hueVal, 255, 255); //this is the reason we use HSB to only change the one value hue
       line(xPos + i, yPos, xPos + i, yPos + sliderH);
     }
     if (centerOfMass_x > xPos && centerOfMass_x < (xPos + sliderW) && centerOfMass_y > yPos && centerOfMass_y < (yPos + sliderH)) {
@@ -34,10 +34,10 @@ class Slider {
     }
     stroke(100);
     hueVal = map(sliderPosition, 0.0, sliderW, 0.0, 255.0);
-    fill(hueVal, 255, 255);
+    fill(hueVal, 255, 255); //Fill the center of the slider position indicator with the color that is selected
     rect(sliderPosition + xPos - 3, yPos - 5, 20, sliderH + 10);
     noStroke();
-    if (!isErasing) {
+    if (!isErasing) { //if the user is not erasing, then use the selected color.
       currentDrawingColor = color(hueVal, 255, 255);
       colourVal = hueVal;
     }
