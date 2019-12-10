@@ -1,5 +1,4 @@
 // this code was inspired by --> https://www.openprocessing.org/sketch/184101
-
 class Slider {
   // variables
   int colorBarWidth;
@@ -16,7 +15,7 @@ class Slider {
     this.calculateCenterOfMass();
     if (showToolbar) {
       updateSlider(sliderX, sliderY, colorBarWidth, colorBarHeight, colourVal);
-      colorBarWidth = width-toolbar.eraser.bWidth-toolbar.toolbarButton.bWidth-200;
+      colorBarWidth = width - toolbar.eraser.bWidth - toolbar.toolbarButton.bWidth - 200;
       sliderX = toolbar.eraser.bWidth+100;
       colorBarHeight = toolbar.tHeight-toolbar.tHeight/3;
     }
@@ -38,7 +37,7 @@ class Slider {
     fill(hueVal, 255, 255);
     rect(sliderPosition + xPos - 3, yPos - 5, 20, sliderH + 10);
     noStroke();
-    if (!isErasing && !isPipetting) {
+    if (!isErasing) {
       currentDrawingColor = color(hueVal, 255, 255);
       colourVal = hueVal;
     }

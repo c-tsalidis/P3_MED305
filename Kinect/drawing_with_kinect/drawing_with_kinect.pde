@@ -23,14 +23,6 @@ ArrayList<Float> ySilhouetteCoordinates = new ArrayList<Float>();
 float centerOfMass_x; 
 float centerOfMass_y;
 
-int numColors = 6;
-int [] xColorPalette = new int[numColors];
-int [] yColorPalette = new int[numColors];
-color [] drawingColors = new color[numColors];
-int colorPaletteHeight = 100;
-int eraserWidth = 50;
-int colorPalettesWidth;
-
 boolean isMouseControlled = false;
 
 int noiseFilter = 50;
@@ -63,9 +55,6 @@ void draw() {
   // we clear the array lists, as there is a new silhouette every frame, and we only to keep track of the latest silhouette coordinates, not of the entire history of silhouettes
   xSilhouetteCoordinates.clear();
   ySilhouetteCoordinates.clear();
-  closestDepths.clear();
-  xClosestDepthCoord.clear();
-  yClosestDepthCoord.clear();
   centerOfMass_x = width * 2;
   centerOfMass_y = height * 2;
 }

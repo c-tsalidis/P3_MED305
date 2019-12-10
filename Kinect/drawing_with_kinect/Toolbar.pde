@@ -15,10 +15,10 @@ class Toolbar {
     toolbarImg = loadImage("hand.png");
     toolbarInactiveImg = loadImage("handInactive.png");
     // initializing the buttons
-    eraser = new Button(0, 0, 100, 50, true, false, false, "Eraser", eraserImg);
+    eraser = new Button(0, 0, 100, 50, true, false, "Eraser", eraserImg);
     eraser.bWidth = this.tHeight;
     eraser.bHeight = this.tHeight;
-    toolbarButton = new Button(width - 100, 0, 100, 50, false, false, true, "Toolbar", toolbarImg);
+    toolbarButton = new Button(width - 100, 0, 100, 50, false, true, "Toolbar", toolbarImg);
     toolbarButton.bWidth = this.tHeight;
     toolbarButton.bHeight = this.tHeight;
     toolbarButton.x = width - toolbarButton.bWidth;
@@ -39,16 +39,5 @@ class Toolbar {
       isErasing = false;
       currentDrawingColor = previousColor;
     }
-  }
-  
-  void imageThreshold(PImage image) {
-    image.loadPixels();
-    for (int x = 0; x < image.width; x++) {
-      for (int y = 0; y < image.height; y++) {
-        int loc = x + y * image.width;
-        if(image.pixels[loc] != 255) image.pixels[loc] = 255;
-      }
-    }
-    image.updatePixels();
   }
 }

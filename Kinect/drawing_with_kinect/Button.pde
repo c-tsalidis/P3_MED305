@@ -1,26 +1,25 @@
 class Button {
   // variables
   int x, y, bWidth, bHeight;
-  boolean isEraser, isPipet, isToolbarButton;
-  boolean hasEnteredEraser = false, hasEnteredPipet = false, hasEnteredToolbarButton = false;
+  boolean isEraser, isToolbarButton;
+  boolean hasEnteredEraser = false, hasEnteredToolbarButton = false;
   String text;
   PImage image;
 
   // constructor
-  Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isPipet, boolean _isToolbarButton, String _text, PImage _image) {
+  Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isToolbarButton, String _text, PImage _image) {
     this.x = _x;
     this.y = _y;
     this.bWidth = _bWidth;
     this.bHeight = _bHeight;
     this.isEraser = _isEraser;
-    this.isPipet = _isPipet;
     this.isToolbarButton = _isToolbarButton;
     this.text = _text;
     this.image = _image;
   }
 
   void update() {
-    this.display();
+    this.display(); // show the button
     this.calculateCenterOfMass();
     if (this.centerOfMassInsideHitbox()) {
       if (this.isToolbarButton) {
