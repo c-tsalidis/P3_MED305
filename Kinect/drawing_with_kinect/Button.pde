@@ -22,18 +22,23 @@ class Button {
     this.display(); // show the button
     this.calculateCenterOfMass();
     if (this.centerOfMassInsideHitbox()) {
-      if (this.isToolbarButton && !hasEnteredToolbarButton) {
-        showToolbar = !showToolbar;
-        hasEnteredToolbarButton = true;
+      if (this.isToolbarButton) {
+        if (!hasEnteredToolbarButton) {
+          showToolbar = !showToolbar;
+          hasEnteredToolbarButton = true;
+        }
       }
-      else if (this.isEraser && !hasEnteredEraser) {
-        isErasing = !isErasing;
-        hasEnteredEraser = true;
-        if(isErasing) {
-          previousColor = currentDrawingColor;
-          currentDrawingColor = backgroundColor;
-        } 
-        else currentDrawingColor = previousColor;
+      else if (this.isEraser) {
+        if (!hasEnteredEraser) {
+          isErasing = !isErasing;
+          hasEnteredEraser = true;
+          if(isErasing) {
+            previousColor = currentDrawingColor;
+            currentDrawingColor = backgroundColor;
+          } else {
+            currentDrawingColor = previousColor;
+          }
+        }
       }
     }
     else {
