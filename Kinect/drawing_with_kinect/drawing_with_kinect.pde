@@ -20,11 +20,6 @@ color backgroundColor = color(#161616);
 ArrayList<Float> xSilhouetteCoordinates = new ArrayList<Float>();
 ArrayList<Float> ySilhouetteCoordinates = new ArrayList<Float>();
 
-IntList closestDepths = new IntList();
-
-ArrayList<Float> xClosestDepthCoord = new ArrayList<Float>();
-ArrayList<Float> yClosestDepthCoord = new ArrayList<Float>();
-
 float centerOfMass_x; 
 float centerOfMass_y;
 
@@ -41,13 +36,7 @@ boolean isMouseControlled = false;
 int noiseFilter = 50;
 
 Toolbar toolbar;
-boolean isErasing = false, isPipetting = false, showToolbar = false;
-
-float pipetX, pipetY;
-
-color pipetColor;
-
-int framesCounter;
+boolean isErasing = false, showToolbar = false;
 
 // runs once
 void setup() {
@@ -68,7 +57,6 @@ void draw() {
   colorMode(RGB);
   image(backgroundImage, 0, 0);
   processDepth(); // process the depth values given by the kinect, and draw the silhoutte if user inside boundaries (between min and max thresholds)
-  // showCenterOfMass(); // draw the center of mass - for testing purposes 
   updateBackgroundImage(); // get the current image and save it, and replace the white silhouette with the background
   toolbar.update();
 
@@ -80,18 +68,12 @@ void draw() {
   yClosestDepthCoord.clear();
   centerOfMass_x = width * 2;
   centerOfMass_y = height * 2;
-
-  // PImage depthImg = kinect.getDepthImage(); 
-  // image(depthImg, 0, 0);
-  framesCounter++;
 }
 
 void processDepth() {
   int [] depth = kinect.getRawDepth(); // get the depth values ranging from 0-4500 from the kinect
-  depth = cleanDepthValues(depth);
-
+  depth = cleanDepthValues(depth); // for cleaning the values that are causing noise
   int skip = 1;
-  int closestCounter = 0; // for counting the closest depth values to the kinect
   for (int x = 0; x < kinect.depthWidth; x += skip) {
     for (int y = 0; y < kinect.depthHeight; y += skip) {
       int offset = x + y * kinect.depthWidth;
@@ -100,15 +82,7 @@ void processDepth() {
       float _x = map(x, 0, kinect.depthWidth, 0, width);
       float _y = map(y, 0, kinect.depthHeight, 0, height);
       if (d > minSilhouetteThreshold && d < maxSilhouetteThreshold) drawSilhouette(_x, _y);
-      else if (d > minDrawingThreshold && d < maxDrawingThreshold) {
-        makeDrawing(_x, _y);
-        if (closestCounter > noiseFilter) {
-          closestDepths.append(d);
-          xClosestDepthCoord.add(_x);
-          yClosestDepthCoord.add(_y);
-        }
-        closestCounter++;
-      }
+      else if (d > minDrawingThreshold && d < maxDrawingThreshold) makeDrawing(_x, _y);
     }
   }
 }
@@ -121,14 +95,8 @@ void drawSilhouette(float x, float y) {
 }
 
 void makeDrawing(float x, float y) {
-  if (isPipetting) return; //delete
   fill(currentDrawingColor);
   ellipse(x, y, 5, 5); // create an ellipse for showing the hands (what the user is currently drawing)
-}
-
-void showCenterOfMass() {
-  fill(currentDrawingColor);
-  ellipse(centerOfMass_x, centerOfMass_y, 30, 30);
 }
 
 void updateBackgroundImage() {
@@ -142,67 +110,6 @@ void updateBackgroundImage() {
     }
   }
   backgroundImage.updatePixels(); // update the previous image pixels
-}
-
-void updateCurrentDrawingColor() {
-  for (int i = 0; i < numColors; i++) {
-    if (centerOfMass_x > xColorPalette[i] && centerOfMass_x < xColorPalette[i] + colorPalettesWidth) currentDrawingColor = drawingColors[i];
-  }
-}
-
-// delete??
-void calculatePipetCenterOfMass() {
-  if (!isPipetting) return;
-  if (isMouseControlled) { 
-    centerOfMass_x = mouseX;
-    centerOfMass_y = mouseY;
-    return;
-  }
-  int min;
-  if (closestDepths.size() > 0) min = closestDepths.max();
-  else min = 0;
-  for (int i = 0; i < closestDepths.size(); i++) {
-    if (closestDepths.get(i) < min) {
-      min = closestDepths.get(i);
-      pipetX = xClosestDepthCoord.get(i);
-      pipetY = yClosestDepthCoord.get(i);
-    }
-  }
-}
-
-void reduceNoise() {
-  PImage current = get();
-  PImage reducedNoiseImg = createImage(width, height, RGB);
-  int skip = 1;
-  // to avoid the noise 
-   // Go though all the neighbouring pixels to the current pixel in the for loops
-   // caclulate the sum of the elements that are colored (neither black or white)
-   // to go through the nwighbouring elements, go through a kernel with a skip
-  reducedNoiseImg.loadPixels();
-   for(int x = skip; x < current.width - skip; x+=1) {
-     for(int y = skip; y < current.height - skip; y+=1) {
-       int sum = 0; // the sum of all the elements of the kernel that are not white or black
-       int pos = x + y * current.width;
-       for(int kx = -skip; kx <= skip; kx++) {
-         for(int ky = -skip; ky <= skip; ky++) {
-           // calculate the neighbouring point to the current pixel
-           int loc = (x + kx) + (y + ky)*current.width;
-           if(current.pixels[loc] != color(0) && current.pixels[loc] != color(255)) { // it means that this pixel is colored
-             sum++;
-           }
-         }
-       }
-       // if the sum is not 9 (the total amount of neighbouring elements) it means that this pixel should be set to the background color
-       if(sum < (3*3)) reducedNoiseImg.pixels[pos] = backgroundColor; //3*3 = 9??
-       else {
-         reducedNoiseImg.pixels[pos] = current.pixels[pos];
-         reducedNoiseImg.pixels[pos - 1] = current.pixels[pos];
-         reducedNoiseImg.pixels[pos + 1] = current.pixels[pos];
-       }
-     }
-   }
-   reducedNoiseImg.updatePixels();
-   image(reducedNoiseImg, 0, 0);
 }
 
 int [] cleanDepthValues(int [] depth) {
