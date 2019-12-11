@@ -139,5 +139,5 @@ void keyPressed() {
     backgroundImage.updatePixels();
   }
   // if the user presses the 'RIGHT' key on the keyboard, then save the current frame to the device as a .png file
-  if (keyCode == RIGHT) saveFrame("data/Drawing-######.png");
+  if (keyCode == RIGHT) saveFrame("drawings/Drawing-######.png");
 }
