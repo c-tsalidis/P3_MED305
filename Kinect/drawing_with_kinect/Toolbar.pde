@@ -2,7 +2,7 @@ class Toolbar {
   // variables
   Slider slider; // creating the slider
   Button eraser, toolbarButton; // creating the buttons
-  PImage eraserImg, pipetImg, toolbarImg, toolbarInactiveImg, eraserInactiveImg;
+  PImage eraserImg, toolbarImg, toolbarInactiveImg, eraserInactiveImg;
   int tHeight = 75;
   
   // constructor
@@ -15,12 +15,8 @@ class Toolbar {
     toolbarImg = loadImage("hand.png");
     toolbarInactiveImg = loadImage("handInactive.png");
     // initializing the buttons
-    eraser = new Button(0, 0, 100, 50, true, false, "Eraser", eraserImg);
-    eraser.bWidth = this.tHeight;
-    eraser.bHeight = this.tHeight;
-    toolbarButton = new Button(width - 100, 0, 100, 50, false, true, "Toolbar", toolbarImg);
-    toolbarButton.bWidth = this.tHeight;
-    toolbarButton.bHeight = this.tHeight;
+    eraser = new Button(0, 0, this.tHeight, this.tHeight, true, false, eraserImg);
+    toolbarButton = new Button(0, 0, this.tHeight, this.tHeight, false, true, toolbarImg);
     toolbarButton.x = width - toolbarButton.bWidth;
   }
   

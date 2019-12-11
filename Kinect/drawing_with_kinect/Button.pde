@@ -3,18 +3,16 @@ class Button {
   int x, y, bWidth, bHeight;
   boolean isEraser, isToolbarButton;
   boolean hasEnteredEraser = false, hasEnteredToolbarButton = false;
-  String text;
   PImage image;
 
   // constructor
-  Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isToolbarButton, String _text, PImage _image) {
+  Button(int _x, int _y, int _bWidth, int _bHeight, boolean _isEraser, boolean _isToolbarButton, PImage _image) {
     this.x = _x;
     this.y = _y;
     this.bWidth = _bWidth;
     this.bHeight = _bHeight;
     this.isEraser = _isEraser;
     this.isToolbarButton = _isToolbarButton;
-    this.text = _text;
     this.image = _image;
   }
 
